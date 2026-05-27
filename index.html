@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Joga Junto — O Canal Que Te Dá Prêmios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: #0d0d1a; font-family: 'Nunito', sans-serif; color: #fff; padding: 1.5rem 1rem 3rem; position: relative; overflow-x: hidden; }
+    .confetti-bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .dot { position: absolute; border-radius: 50%; opacity: 0.15; animation: float linear infinite; }
+    @keyframes float { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.15; } 90% { opacity: 0.15; } 100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; } }
+    @keyframes wiggle { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+    @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+    @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(255,200,0,0.3); } 50% { box-shadow: 0 0 40px rgba(255,200,0,0.7); } }
+    @keyframes countdown-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+    .wrapper { position: relative; z-index: 1; }
+    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; max-width: 900px; margin: 0 auto; align-items: start; }
+    @media (max-width: 680px) { .layout { grid-template-columns: 1fr; } .sidebar { order: -1; } }
+
+    .header { text-align: center; margin-bottom: 1.25rem; animation: pop 0.6s ease forwards; grid-column: 1 / -1; }
+    .emoji-top { font-size: 2.2rem; display: inline-block; animation: wiggle 2s ease-in-out infinite; }
+    .title { font-family: 'Fredoka One', cursive; font-size: clamp(2.4rem,7vw,4.5rem); line-height: 1; background: linear-gradient(135deg,#FFD700,#FF8C00,#FF4500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.2rem; }
+    .subtitle { font-size: 12px; color: #666; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+
+    .challenge-pill { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin: 0 auto 1.25rem; max-width: 100%; background: #161625; border: 2px solid #2a2a45; border-radius: 50px; padding: 0.6rem 1.25rem; animation: pop 0.6s 0.1s ease both; grid-column: 1 / -1; }
+    .pill-sep { color: #333; }
+    .prize-tag { background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; font-weight: 800; padding: 3px 12px; border-radius: 20px; font-size: 13px; }
+    .status-tag { background: rgba(0,230,100,0.15); color: #00e664; border: 1px solid rgba(0,230,100,0.3); padding: 3px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
+    .status-tag.waiting { background: rgba(255,180,0,0.15); color: #FFB400; border-color: rgba(255,180,0,0.3); }
+    .status-tag.closed { background: rgba(100,100,100,0.15); color: #444; border-color: rgba(100,100,100,0.2); }
+
+    .main-col { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* TELA DE AGUARDE */
+    .waiting-box { background: #161625; border: 2px solid #2a2a45; border-radius: 20px; padding: 1.5rem 1.25rem; text-align: center; animation: pop 0.6s 0.2s ease both; display: none; }
+    .waiting-title { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #FFB400; margin-bottom: 0.5rem; }
+    .waiting-sub { font-size: 13px; color: #555; font-weight: 600; margin-bottom: 1rem; }
+    .countdown-nums { font-family: 'Fredoka One', cursive; font-size: clamp(2.5rem,8vw,4rem); letter-spacing: 4px; color: #FFB400; line-height: 1; margin-bottom: 0.5rem; }
+    .countdown-label { font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #555; }
+    .countdown-parts { display: flex; justify-content: center; gap: 1rem; margin-top: 0.75rem; }
+    .countdown-part { text-align: center; }
+    .countdown-part-num { font-family: 'Fredoka One', cursive; font-size: clamp(1.8rem,6vw,3rem); color: #FFB400; line-height: 1; }
+    .countdown-part-label { font-size: 10px; color: #555; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .countdown-sep { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #333; align-self: flex-start; padding-top: 4px; }
+
+    /* TIMER DO DESAFIO */
+    .timer-box { background: #161625; border: 2px solid #2a2a45; border-radius: 20px; padding: 1rem 1.25rem; text-align: center; animation: pop 0.6s 0.2s ease both; display: none; }
+    .timer-box.warning { border-color: #FF8C00; animation: pulse-glow 1s infinite; }
+    .timer-box.danger { border-color: #FF4500; }
+    .timer-label { font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+    .timer-nums { font-family: 'Fredoka One', cursive; font-size: clamp(3rem,10vw,5rem); letter-spacing: 6px; color: #FFD700; line-height: 1; }
+    .timer-nums.warning { color: #FF8C00; animation: countdown-pulse 0.5s infinite; }
+    .timer-nums.danger { color: #FF4500; }
+    .timer-msg { font-size: 13px; font-weight: 700; color: #555; margin-top: 4px; }
+    .progress-wrap { height: 6px; background: #1e1e30; border-radius: 3px; margin-top: 0.75rem; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,#FFD700,#FF8C00); border-radius: 3px; transition: width 1s linear; }
+    .progress-fill.danger { background: linear-gradient(90deg,#FF8C00,#FF4500); }
+
+    .form-card { background: #161625; border: 2px solid #2a2a45; border-radius: 24px; padding: 1.5rem; animation: pop 0.6s 0.3s ease both; display: none; }
+    .form-title { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #FFD700; margin-bottom: 1rem; text-align: center; }
+    .field { margin-bottom: 0.9rem; }
+    .field label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .field input { width: 100%; background: #0d0d1a; border: 2px solid #2a2a45; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #fff; outline: none; transition: border-color 0.2s; font-weight: 600; }
+    .field input:focus { border-color: #FFD700; }
+    .field input::placeholder { color: #2a2a45; }
+    .answer-field input { font-family: 'Fredoka One', cursive; font-size: 2rem; text-align: center; letter-spacing: 6px; color: #FFD700; border-color: #FFD700; padding: 12px; }
+    .secret-field input { font-family: 'Fredoka One', cursive; letter-spacing: 4px; text-align: center; font-size: 1.1rem; color: #FF8C00; }
+    .checks { margin: 1rem 0; display: flex; flex-direction: column; gap: 6px; }
+    .check-item { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; padding: 6px 8px; border-radius: 8px; transition: background 0.15s; }
+    .check-item:hover { background: rgba(255,215,0,0.05); }
+    .check-item input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; accent-color: #FFD700; cursor: pointer; }
+    .check-item span { font-size: 12px; color: #666; line-height: 1.5; font-weight: 600; }
+    .btn-send { width: 100%; padding: 14px; background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.3rem; letter-spacing: 2px; cursor: pointer; transition: transform 0.15s; }
+    .btn-send:hover { transform: scale(1.02); }
+    .btn-send:active { transform: scale(0.97); }
+    .btn-send:disabled { background: #1e1e30; color: #333; cursor: not-allowed; transform: none; }
+    .btn-send.error { background: linear-gradient(135deg,#FF4500,#FF0000); animation: shake 0.4s ease; }
+
+    .success-screen { display: none; text-align: center; padding: 2rem 1rem; animation: fadeIn 0.5s ease; }
+    .trophy { font-size: 4rem; display: block; margin-bottom: 0.75rem; animation: wiggle 1s ease-in-out infinite; }
+    .success-title { font-family: 'Fredoka One', cursive; font-size: 2rem; background: linear-gradient(135deg,#FFD700,#FF8C00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; }
+    .success-sub { font-size: 14px; color: #666; font-weight: 600; line-height: 1.7; }
+    .closed-screen { display: none; text-align: center; padding: 2.5rem 1rem; }
+    .closed-emoji { font-size: 3.5rem; margin-bottom: 0.75rem; display: block; }
+    .closed-title { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #444; margin-bottom: 0.5rem; }
+    .closed-sub { font-size: 13px; color: #444; font-weight: 600; }
+
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; animation: pop 0.6s 0.4s ease both; }
+    .winners-card { background: #161625; border: 2px solid #2a2a45; border-radius: 20px; padding: 1.25rem; position: sticky; top: 1rem; }
+    .winners-title { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #FFD700; margin-bottom: 0.25rem; }
+    .winners-sub { font-size: 11px; color: #555; font-weight: 700; margin-bottom: 1rem; }
+    .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #00e664; margin-right: 6px; animation: pulse-dot 1.5s infinite; }
+    .slots { display: flex; flex-direction: column; gap: 8px; }
+    .slot { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: #0d0d1a; border: 1px solid #1e1e30; }
+    .slot.filled { border-color: #2a2a45; animation: slideIn 0.4s ease; }
+    .slot-num { font-family: 'Fredoka One', cursive; font-size: 1rem; color: #333; width: 22px; text-align: center; flex-shrink: 0; }
+    .slot.filled .slot-num { color: #FFD700; }
+    .slot-info { flex: 1; min-width: 0; }
+    .slot-name { font-size: 13px; font-weight: 700; color: #f0ede6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .slot-time { font-size: 11px; color: #555; font-weight: 600; }
+    .slot-empty .slot-name { color: #2a2a45; font-style: italic; font-weight: 600; }
+    .slot-check { font-size: 16px; }
+    .loading-msg { text-align: center; font-size: 12px; color: #555; font-weight: 600; padding: 0.5rem 0; }
+    .footer { text-align: center; margin-top: 2rem; font-size: 12px; color: #2a2a45; font-weight: 700; letter-spacing: 1px; grid-column: 1 / -1; }
+    .footer a { color: #333; text-decoration: none; margin: 0 8px; }
+    .footer a:hover { color: #555; }
+  </style>
+</head>
+<body>
+  <div class="confetti-bg" id="confetti-bg"></div>
+  <div class="wrapper">
+    <div class="layout">
+      <div class="header">
+        <span class="emoji-top">🎯</span>
+        <div class="title">Joga Junto</div>
+        <p class="subtitle">o canal que te dá prêmios!</p>
+      </div>
+
+      <div class="challenge-pill">
+        <span style="font-size:14px;font-weight:700;">📍 <span id="ch-name">Parque Ibirapuera #01</span></span>
+        <span class="pill-sep">·</span>
+        <span class="prize-tag">💰 🎁 Prêmio para os 10 primeiros</span>
+        <span class="pill-sep">·</span>
+        <span class="status-tag waiting" id="status-tag">⏳ Em breve</span>
+      </div>
+
+      <div class="main-col">
+
+        <!-- TELA DE AGUARDE -->
+        <div class="waiting-box" id="waiting-box">
+          <div class="waiting-title">🎬 Assiste o vídeo enquanto isso!</div>
+          <div class="waiting-sub">O desafio abre automaticamente em:</div>
+          <div class="countdown-parts">
+            <div class="countdown-part">
+              <div class="countdown-part-num" id="cd-h">00</div>
+              <div class="countdown-part-label">horas</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-part">
+              <div class="countdown-part-num" id="cd-m">00</div>
+              <div class="countdown-part-label">min</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-part">
+              <div class="countdown-part-num" id="cd-s">00</div>
+              <div class="countdown-part-label">seg</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIMER DO DESAFIO -->
+        <div class="timer-box" id="timer-box">
+          <div class="timer-label">⏱ tempo restante</div>
+          <div class="timer-nums" id="timer-nums">10:00</div>
+          <div class="timer-msg" id="timer-msg">Corre que ainda dá tempo! 🏃</div>
+          <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%"></div></div>
+        </div>
+
+        <!-- FORMULÁRIO -->
+        <div class="form-card" id="form-card">
+          <div id="form-inner">
+            <div class="form-title">✍️ Manda sua resposta!</div>
+            <div class="field"><label>📺 Nome do seu canal</label><input type="text" id="f-channel" placeholder="Ex: Canal da Maria"/></div>
+            <div class="field"><label>🔗 Link ou @ do canal</label><input type="text" id="f-link" placeholder="@seucanal"/></div>
+            <div class="field"><label>📧 E-mail para contato</label><input type="email" id="f-email" placeholder="seuemail@gmail.com"/></div>
+            <div class="field answer-field"><label>🔢 Sua resposta final</label><input type="number" id="f-answer" placeholder="?" min="0"/></div>
+            <div class="field secret-field"><label>🤫 Código secreto do vídeo</label><input type="text" id="f-secret" placeholder="CÓDIGO" style="text-transform:uppercase"/></div>
+            <div class="checks">
+              <label class="check-item"><input type="checkbox" id="ck1"/><span>✅ Li e aceito o regulamento do desafio.</span></label>
+              <label class="check-item"><input type="checkbox" id="ck2"/><span>☝️ Confirmo que enviei apenas uma resposta.</span></label>
+              <label class="check-item"><input type="checkbox" id="ck3"/><span>📞 Autorizo contato se estiver entre os vencedores.</span></label>
+              <label class="check-item"><input type="checkbox" id="ck4"/><span>ℹ️ Ciente de que o YouTube não patrocina este desafio.</span></label>
+            </div>
+            <button class="btn-send" id="btn-send" onclick="handleSubmit()">🚀 ENVIAR MINHA RESPOSTA</button>
+          </div>
+          <div class="success-screen" id="success-screen">
+            <span class="trophy">🏆</span>
+            <div class="success-title">Boa sorte, campeão!</div>
+            <p class="success-sub">Resposta registrada com sucesso! 🎉<br>Fique ligado no canal para o resultado.<br>Compartilha com os amigos! 📣</p>
+          </div>
+          <div class="success-screen" id="wrong-screen" style="display:none">
+            <span class="trophy">😔</span>
+            <div class="success-title" style="background:linear-gradient(135deg,#FF4500,#FF0000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Quase lá!</div>
+            <p class="success-sub">Sua resposta foi registrada, mas não foi a correta.<br>Fique ligado no próximo desafio! 💪</p>
+          </div>
+          <div class="closed-screen" id="closed-screen">
+            <span class="closed-emoji">⌛</span>
+            <div class="closed-title">Desafio encerrado!</div>
+            <p class="closed-sub">O tempo acabou. Fique ligado<br>para o próximo desafio! 👀</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="winners-card">
+          <div class="winners-title">🏅 Ganhadores ao vivo</div>
+          <div class="winners-sub"><span class="live-dot"></span>Atualizando em tempo real</div>
+          <div class="slots" id="slots"></div>
+          <div class="loading-msg" id="loading-msg">Aguardando início...</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>© 2025 Joga Junto</span>
+        <a href="regulamento-jogajunto.pdf" download="Regulamento-JogaJunto.pdf">📋 Regulamento</a>
+        <a href="mailto:comercialknp@gmail.com">Contato</a>
+        <a href="#">Vencedores anteriores</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // CONFIGURAÇÕES — não precisa mais editar aqui!
+    // Use o painel admin em /admin.html
+    // =====================================================
+    const SUPABASE_URL = 'https://xcwftyikbrioyrgrkiaj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
+    const TOTAL_VAGAS = 10;
+    const TOTAL_SECS  = 600;
+
+    let DESAFIO = '', GABARITO = 0, CODIGO_SECRETO = '';
+    // =====================================================
+
+    let ticker = null, done = false, fase = 'waiting';
+    let remaining = TOTAL_SECS;
+
+    function pad(n){ return String(n).padStart(2,'0'); }
+
+    const timerMsgs = [
+      [600,'Corre que ainda dá tempo! 🏃'],
+      [300,'Metade do tempo! Vai logo! 😅'],
+      [120,'Só 2 minutinhos! Apressaa! 😰'],
+      [60,'ÚLTIMO MINUTO! CORRE!! 🔥'],
+      [30,'30 SEGUNDOS!! VAI VAI VAI!! 🚨'],
+      [10,'10... 9... 8... RESPIRA!! 😱'],
+      [0,'Tempo esgotado! 😤']
+    ];
+    function getMsg(t){ for(let i=timerMsgs.length-1;i>=0;i--){if(t<=timerMsgs[i][0])return timerMsgs[i][1];}return timerMsgs[0][1]; }
+
+    function showWaiting(){
+      fase = 'waiting';
+      document.getElementById('waiting-box').style.display = 'block';
+      document.getElementById('timer-box').style.display = 'none';
+      document.getElementById('form-card').style.display = 'none';
+      const st = document.getElementById('status-tag');
+      st.textContent = '⏳ Em breve';
+      st.className = 'status-tag waiting';
+      document.getElementById('loading-msg').textContent = 'Aguardando início...';
+    }
+
+    function showOpen(){
+      fase = 'open';
+      document.getElementById('waiting-box').style.display = 'none';
+      document.getElementById('timer-box').style.display = 'block';
+      document.getElementById('form-card').style.display = 'block';
+      const st = document.getElementById('status-tag');
+      st.textContent = '● Aberto';
+      st.className = 'status-tag';
+      fetchWinners();
+    }
+
+    function showClosed(){
+      fase = 'closed';
+      done = true;
+      document.getElementById('waiting-box').style.display = 'none';
+      document.getElementById('timer-box').style.display = 'block';
+      document.getElementById('timer-nums').textContent = '00:00';
+      document.getElementById('form-card').style.display = 'block';
+      document.getElementById('form-inner').style.display = 'none';
+      document.getElementById('closed-screen').style.display = 'block';
+      const st = document.getElementById('status-tag');
+      st.textContent = '● Encerrado';
+      st.className = 'status-tag closed';
+      fetchWinners();
+    }
+
+
+
+    function tickDesafio(){
+      if(done) return;
+      remaining--;
+      const m=Math.floor(remaining/60), s=remaining%60;
+      const numsEl=document.getElementById('timer-nums');
+      const boxEl=document.getElementById('timer-box');
+      const fillEl=document.getElementById('progress-fill');
+      numsEl.textContent=pad(m)+':'+pad(s);
+      document.getElementById('timer-msg').textContent=getMsg(remaining);
+      fillEl.style.width=Math.round((remaining/TOTAL_SECS)*100)+'%';
+      numsEl.classList.remove('warning','danger'); boxEl.classList.remove('warning','danger'); fillEl.classList.remove('danger');
+      if(remaining<=30){numsEl.classList.add('danger');boxEl.classList.add('danger');fillEl.classList.add('danger');}
+      else if(remaining<=120){numsEl.classList.add('warning');boxEl.classList.add('warning');}
+      if(remaining<=0){ clearInterval(ticker); showClosed(); }
+    }
+
+
+
+    function formatTime(iso){ return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+    function renderSlots(entries){
+      const c=document.getElementById('slots');
+      c.innerHTML='';
+      document.getElementById('loading-msg').style.display='none';
+      for(let i=0;i<TOTAL_VAGAS;i++){
+        const div=document.createElement('div');
+        if(i<entries.length){
+          const e=entries[i];
+          div.className='slot filled';
+          div.innerHTML=`<div class="slot-num">${i+1}</div><div class="slot-info"><div class="slot-name">${e.canal_nome||'Anônimo'}</div><div class="slot-time">✅ ${formatTime(e.criado_em)}</div></div><span class="slot-check">🏅</span>`;
+        } else {
+          div.className='slot slot-empty';
+          div.innerHTML=`<div class="slot-num">${i+1}</div><div class="slot-info"><div class="slot-name">aguardando...</div></div><span class="slot-check" style="opacity:0.2">⏳</span>`;
+        }
+        c.appendChild(div);
+      }
+    }
+
+    async function fetchWinners(){
+      try{
+        const res=await fetch(`${SUPABASE_URL}/rest/v1/respostas?desafio=eq.${encodeURIComponent(DESAFIO)}&correta=eq.true&order=criado_em.asc&limit=${TOTAL_VAGAS}`,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}});
+        if(!res.ok) return;
+        renderSlots(await res.json());
+      }catch(e){}
+    }
+
+    async function handleSubmit(){
+      const channel=document.getElementById('f-channel').value.trim();
+      const link=document.getElementById('f-link').value.trim();
+      const email=document.getElementById('f-email').value.trim();
+      const answer=document.getElementById('f-answer').value.trim();
+      const secret=document.getElementById('f-secret').value.trim().toUpperCase();
+      const checks=['ck1','ck2','ck3','ck4'].every(id=>document.getElementById(id).checked);
+      const btn=document.getElementById('btn-send');
+
+      // Validação de campos
+      if(!channel||!link||!email||!answer||!secret||!checks){
+        btn.textContent='⚠️ Preencha tudo antes de enviar!';btn.classList.add('error');
+        setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';btn.classList.remove('error');},2200);return;
+      }
+
+      // Validação do código secreto
+      if(secret !== CODIGO_SECRETO){
+        btn.textContent='🔑 Código secreto incorreto!';btn.classList.add('error');
+        setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';btn.classList.remove('error');},2500);return;
+      }
+
+      // Validação da resposta
+      const respostaCorreta = parseInt(answer) === GABARITO;
+
+      btn.textContent='⏳ Enviando...';btn.disabled=true;
+      try{
+        const res=await fetch(`${SUPABASE_URL}/rest/v1/respostas`,{
+          method:'POST',
+          headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+          body:JSON.stringify({canal_nome:channel,canal_link:link,email,resposta:parseInt(answer),codigo_secreto:secret,desafio:DESAFIO,correta:respostaCorreta})
+        });
+        if(res.ok||res.status===201){
+          done=true;clearInterval(ticker);
+          document.getElementById('form-inner').style.display='none';
+          if(respostaCorreta){
+            document.getElementById('success-screen').style.display='block';
+          } else {
+            document.getElementById('wrong-screen').style.display='block';
+          }
+          fetchWinners();
+        } else {
+          btn.textContent='❌ Erro ao enviar. Tenta de novo!';btn.disabled=false;
+          setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';},2500);
+        }
+      }catch(e){
+        btn.textContent='❌ Erro de conexão!';btn.disabled=false;
+        setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';},2500);
+      }
+    }
+
+    function spawnDots(){
+      const bg=document.getElementById('confetti-bg');
+      const colors=['#FFD700','#FF8C00','#FF4500','#00e664','#7B68EE','#FF69B4'];
+      for(let i=0;i<20;i++){
+        const d=document.createElement('div');d.className='dot';
+        const size=5+Math.random()*12;
+        d.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${9+Math.random()*14}s;animation-delay:${Math.random()*12}s;`;
+        bg.appendChild(d);
+      }
+    }
+
+    spawnDots();
+    carregarConfigEIniciar();
+
+    async function carregarConfigEIniciar() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/config?id=eq.1`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+        const data = await res.json();
+        if(data && data[0]) {
+          const c = data[0];
+          DESAFIO        = c.desafio || '';
+          GABARITO       = c.gabarito || 0;
+          CODIGO_SECRETO = c.codigo_secreto || '';
+          const aberturaISO = c.abertura || new Date().toISOString();
+
+          // Atualizar UI com dados do desafio
+          const chName = document.getElementById('ch-name');
+          if(chName) chName.textContent = DESAFIO;
+
+          if(c.premio) {
+            const prize = document.getElementById('prize-badge');
+            if(prize) prize.textContent = '🎁 ' + c.premio;
+          }
+
+          // Se inativo, mostrar tela de aguarde permanente
+          if(!c.ativo) {
+            showWaiting();
+            document.getElementById('cd-h').textContent = '--';
+            document.getElementById('cd-m').textContent = '--';
+            document.getElementById('cd-s').textContent = '--';
+            document.getElementById('waiting-box').querySelector('.waiting-title').textContent = '🔜 Novo desafio em breve!';
+            document.getElementById('waiting-box').querySelector('.waiting-sub').textContent = 'Fique ligado no canal para não perder!';
+            return;
+          }
+
+          // Sobrescrever datas com as do banco
+          const ABERTURA_DATE_DYN  = new Date(aberturaISO);
+          const FECHAMENTO_DATE_DYN = new Date(ABERTURA_DATE_DYN.getTime() + TOTAL_SECS * 1000);
+          const now = new Date();
+
+          if(now < ABERTURA_DATE_DYN) {
+            showWaiting();
+            const tickCD = setInterval(() => {
+              const diff = ABERTURA_DATE_DYN - new Date();
+              if(diff <= 0) { clearInterval(tickCD); startDesafioDyn(ABERTURA_DATE_DYN, FECHAMENTO_DATE_DYN); return; }
+              document.getElementById('cd-h').textContent = String(Math.floor(diff/3600000)).padStart(2,'0');
+              document.getElementById('cd-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+              document.getElementById('cd-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+            }, 1000);
+          } else if(now < FECHAMENTO_DATE_DYN) {
+            startDesafioDyn(ABERTURA_DATE_DYN, FECHAMENTO_DATE_DYN);
+          } else {
+            showClosed();
+          }
+        }
+      } catch(e) { showWaiting(); console.error('Erro ao carregar config:', e); }
+    }
+
+    function startDesafioDyn(abertura, fechamento) {
+      showOpen();
+      let rem = Math.max(0, Math.floor((fechamento - new Date()) / 1000));
+      if(rem <= 0) { showClosed(); return; }
+      const t = setInterval(() => {
+        if(done) { clearInterval(t); return; }
+        rem--;
+        const m=Math.floor(rem/60), s=rem%60;
+        const numsEl=document.getElementById('timer-nums');
+        const boxEl=document.getElementById('timer-box');
+        const fillEl=document.getElementById('progress-fill');
+        numsEl.textContent=pad(m)+':'+pad(s);
+        document.getElementById('timer-msg').textContent=getMsg(rem);
+        fillEl.style.width=Math.round((rem/TOTAL_SECS)*100)+'%';
+        numsEl.classList.remove('warning','danger'); boxEl.classList.remove('warning','danger'); fillEl.classList.remove('danger');
+        if(rem<=30){numsEl.classList.add('danger');boxEl.classList.add('danger');fillEl.classList.add('danger');}
+        else if(rem<=120){numsEl.classList.add('warning');boxEl.classList.add('warning');}
+        if(rem<=0){ clearInterval(t); showClosed(); }
+      }, 1000);
+      setInterval(fetchWinners, 5000);
+    }
+  </script>
+</body>
+</html>
