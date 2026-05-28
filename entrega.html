@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastrar entrega — Joga Junto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: #0d0d1a; font-family: 'Nunito', sans-serif; color: #fff; padding: 1.5rem 1rem 3rem; }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 1.5rem; }
+    .title { font-family: 'Fredoka One', cursive; font-size: clamp(2rem,6vw,3rem); background: linear-gradient(135deg,#FFD700,#FF8C00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.25rem; }
+    .subtitle { font-size: 12px; color: #666; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .card { background: #161625; border: 2px solid #2a2a45; border-radius: 24px; padding: 1.75rem 1.5rem; }
+    .lead { font-size: 14px; color: #cbc7bd; font-weight: 600; margin-bottom: 1.25rem; line-height: 1.6; }
+    .lead strong { color: #FFD700; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .row.cols-3 { grid-template-columns: 1fr 1fr 80px; }
+    @media (max-width: 520px) { .row, .row.cols-3 { grid-template-columns: 1fr; } }
+    .field { margin-bottom: 0.85rem; }
+    .field label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+    .field input, .field textarea, .field select { width: 100%; background: #0d0d1a; border: 2px solid #2a2a45; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #fff; outline: none; font-weight: 600; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: #FFD700; }
+    .field textarea { resize: vertical; min-height: 70px; }
+    .btn { width: 100%; padding: 14px; background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.2rem; letter-spacing: 1.5px; cursor: pointer; margin-top: 0.75rem; }
+    .btn:hover { transform: scale(1.01); }
+    .btn:disabled { background: #1e1e30; color: #555; cursor: not-allowed; }
+    .msg { padding: 12px 14px; border-radius: 12px; margin-top: 1rem; font-size: 13px; font-weight: 700; text-align: center; display: none; }
+    .msg.ok { background: rgba(0,230,100,0.15); color: #00e664; border: 1px solid rgba(0,230,100,0.35); }
+    .msg.err { background: rgba(255,69,0,0.15); color: #FF8C00; border: 1px solid rgba(255,69,0,0.35); }
+    .footer { text-align: center; margin-top: 1.5rem; font-size: 12px; color: #333; font-weight: 700; }
+    .footer a { color: #555; text-decoration: none; }
+    .success-screen { display: none; text-align: center; padding: 2rem 0; }
+    .trophy { font-size: 4rem; display: block; margin-bottom: 0.75rem; }
+    .success-title { font-family: 'Fredoka One', cursive; font-size: 1.8rem; background: linear-gradient(135deg,#FFD700,#FF8C00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.75rem; }
+    .success-sub { font-size: 14px; color: #888; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="title">🎁 Cadastrar entrega</div>
+      <div class="subtitle">Joga Junto</div>
+    </div>
+    <div class="card" id="form-card">
+      <div class="lead">
+        Você está entre os <strong>10 ganhadores</strong>? Preencha abaixo para receber seu prêmio. Use o <strong>mesmo e-mail</strong> que cadastrou no desafio.
+      </div>
+
+      <div class="field"><label>📧 E-mail do desafio</label><input type="email" id="f-email" placeholder="seuemail@gmail.com"/></div>
+      <div class="field"><label>👤 Nome completo</label><input type="text" id="f-nome" placeholder="Nome Sobrenome"/></div>
+      <div class="row">
+        <div class="field"><label>🆔 CPF</label><input type="text" id="f-cpf" placeholder="000.000.000-00" maxlength="14"/></div>
+        <div class="field"><label>📱 Telefone (opcional)</label><input type="text" id="f-telefone" placeholder="(11) 90000-0000" maxlength="16"/></div>
+      </div>
+      <div class="field"><label>📮 CEP</label><input type="text" id="f-cep" placeholder="00000-000" maxlength="9"/></div>
+      <div class="row cols-3">
+        <div class="field"><label>🏠 Logradouro</label><input type="text" id="f-logradouro" placeholder="Rua / Avenida..."/></div>
+        <div class="field"><label>Bairro</label><input type="text" id="f-bairro" placeholder="Bairro"/></div>
+        <div class="field"><label>Nº</label><input type="text" id="f-numero" placeholder="123"/></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Cidade</label><input type="text" id="f-cidade" placeholder="Cidade"/></div>
+        <div class="field"><label>UF</label>
+          <select id="f-uf">
+            <option value="">--</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+            <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+            <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+            <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+            <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+            <option>SE</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Complemento (opcional)</label><input type="text" id="f-complemento" placeholder="Apto, bloco, referência..."/></div>
+      <div class="field"><label>📝 Observação (opcional)</label><textarea id="f-obs" placeholder="Algo importante pro envio?"></textarea></div>
+
+      <button class="btn" id="btn" onclick="submit()">🚀 ENVIAR CADASTRO</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="card success-screen" id="success">
+      <span class="trophy">🎉</span>
+      <div class="success-title">Cadastro recebido!</div>
+      <p class="success-sub">
+        Tudo certo, campeão.<br>
+        Vamos preparar seu prêmio e enviar pelos Correios.<br>
+        Você recebe o código de rastreio por e-mail. 📦
+      </p>
+    </div>
+
+    <div class="footer">
+      <a href="/">← Voltar ao desafio</a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://xcwftyikbrioyrgrkiaj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
+
+    function val(id){ return document.getElementById(id).value.trim(); }
+    function showMsg(t, type){
+      const m = document.getElementById('msg');
+      m.textContent = t;
+      m.className = 'msg ' + type;
+      m.style.display = 'block';
+      setTimeout(()=>{ m.style.display='none'; }, 5000);
+    }
+
+    // Auto-preenche endereço via ViaCEP
+    document.getElementById('f-cep').addEventListener('blur', async (e)=>{
+      const cep = e.target.value.replace(/\D/g,'');
+      if(cep.length !== 8) return;
+      try {
+        const r = await fetch('https://viacep.com.br/ws/'+cep+'/json/');
+        const d = await r.json();
+        if(d.erro) return;
+        if(!val('f-logradouro')) document.getElementById('f-logradouro').value = d.logradouro || '';
+        if(!val('f-bairro'))     document.getElementById('f-bairro').value     = d.bairro || '';
+        if(!val('f-cidade'))     document.getElementById('f-cidade').value     = d.localidade || '';
+        if(!val('f-uf'))         document.getElementById('f-uf').value         = d.uf || '';
+      } catch(e){}
+    });
+
+    async function submit(){
+      const btn = document.getElementById('btn');
+      const payload = {
+        p_email: val('f-email').toLowerCase(),
+        p_nome_completo: val('f-nome'),
+        p_cpf: val('f-cpf'),
+        p_cep: val('f-cep'),
+        p_logradouro: val('f-logradouro'),
+        p_numero: val('f-numero'),
+        p_complemento: val('f-complemento'),
+        p_bairro: val('f-bairro'),
+        p_cidade: val('f-cidade'),
+        p_uf: val('f-uf'),
+        p_telefone: val('f-telefone'),
+        p_observacao: val('f-obs')
+      };
+
+      const required = ['p_email','p_nome_completo','p_cpf','p_cep','p_logradouro','p_numero','p_bairro','p_cidade','p_uf'];
+      for(const k of required){
+        if(!payload[k]){ showMsg('Preencha todos os campos obrigatorios', 'err'); return; }
+      }
+
+      btn.disabled = true; btn.textContent = '⏳ Enviando...';
+      try {
+        const res = await fetch(SUPABASE_URL+'/rest/v1/rpc/submit_entrega', {
+          method:'POST',
+          headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if(data.status === 'ok'){
+          document.getElementById('form-card').style.display = 'none';
+          document.getElementById('success').style.display = 'block';
+        } else if(data.status === 'not_winner'){
+          showMsg('❌ Esse e-mail nao consta entre vencedores. Conferir cadastro?', 'err');
+        } else if(data.status === 'already_submitted'){
+          showMsg('⚠️ Voce ja cadastrou a entrega antes. Aguarde o envio.', 'err');
+        } else if(data.status === 'invalid'){
+          showMsg('⚠️ Campo invalido: ' + data.field, 'err');
+        } else {
+          showMsg('❌ Erro: ' + (data.msg || 'Tente novamente'), 'err');
+        }
+      } catch(e){
+        showMsg('❌ Erro de conexao', 'err');
+      } finally {
+        btn.disabled = false; btn.textContent = '🚀 ENVIAR CADASTRO';
+      }
+    }
+  </script>
+</body>
+</html>
