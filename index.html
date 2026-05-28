@@ -39,7 +39,6 @@
 
     .main-col { display: flex; flex-direction: column; gap: 1.25rem; }
 
-    /* TELA DE AGUARDE */
     .waiting-box { background: #161625; border: 2px solid #2a2a45; border-radius: 20px; padding: 1.5rem 1.25rem; text-align: center; animation: pop 0.6s 0.2s ease both; display: none; }
     .waiting-title { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #FFB400; margin-bottom: 0.5rem; }
     .waiting-sub { font-size: 13px; color: #555; font-weight: 600; margin-bottom: 1rem; }
@@ -51,7 +50,6 @@
     .countdown-part-label { font-size: 10px; color: #555; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
     .countdown-sep { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #333; align-self: flex-start; padding-top: 4px; }
 
-    /* TIMER DO DESAFIO */
     .timer-box { background: #161625; border: 2px solid #2a2a45; border-radius: 20px; padding: 1rem 1.25rem; text-align: center; animation: pop 0.6s 0.2s ease both; display: none; }
     .timer-box.warning { border-color: #FF8C00; animation: pulse-glow 1s infinite; }
     .timer-box.danger { border-color: #FF4500; }
@@ -78,6 +76,7 @@
     .check-item:hover { background: rgba(255,215,0,0.05); }
     .check-item input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; accent-color: #FFD700; cursor: pointer; }
     .check-item span { font-size: 12px; color: #666; line-height: 1.5; font-weight: 600; }
+    .check-item a { color: #FFD700; text-decoration: underline; }
     .btn-send { width: 100%; padding: 14px; background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.3rem; letter-spacing: 2px; cursor: pointer; transition: transform 0.15s; }
     .btn-send:hover { transform: scale(1.02); }
     .btn-send:active { transform: scale(0.97); }
@@ -127,14 +126,13 @@
       <div class="challenge-pill">
         <span style="font-size:14px;font-weight:700;">📍 <span id="ch-name">Parque Ibirapuera #01</span></span>
         <span class="pill-sep">·</span>
-        <span class="prize-tag">💰 🎁 Prêmio para os 10 primeiros</span>
+        <span class="prize-tag">🎁 Prêmio para os 10 primeiros</span>
         <span class="pill-sep">·</span>
         <span class="status-tag waiting" id="status-tag">⏳ Em breve</span>
       </div>
 
       <div class="main-col">
 
-        <!-- TELA DE AGUARDE -->
         <div class="waiting-box" id="waiting-box">
           <div class="waiting-title">🎬 Assiste o vídeo enquanto isso!</div>
           <div class="waiting-sub">O desafio abre automaticamente em:</div>
@@ -156,7 +154,6 @@
           </div>
         </div>
 
-        <!-- TIMER DO DESAFIO -->
         <div class="timer-box" id="timer-box">
           <div class="timer-label">⏱ tempo restante</div>
           <div class="timer-nums" id="timer-nums">10:00</div>
@@ -164,7 +161,6 @@
           <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:100%"></div></div>
         </div>
 
-        <!-- FORMULÁRIO -->
         <div class="form-card" id="form-card">
           <div id="form-inner">
             <div class="form-title">✍️ Manda sua resposta!</div>
@@ -174,10 +170,11 @@
             <div class="field answer-field"><label>🔢 Sua resposta final</label><input type="number" id="f-answer" placeholder="?" min="0"/></div>
             <div class="field secret-field"><label>🤫 Código secreto do vídeo</label><input type="text" id="f-secret" placeholder="CÓDIGO" style="text-transform:uppercase"/></div>
             <div class="checks">
-              <label class="check-item"><input type="checkbox" id="ck1"/><span>✅ Li e aceito o regulamento do desafio.</span></label>
+              <label class="check-item"><input type="checkbox" id="ck1"/><span>✅ Li e aceito o <a href="regulamento-jogajunto.pdf" target="_blank">regulamento</a> do desafio.</span></label>
               <label class="check-item"><input type="checkbox" id="ck2"/><span>☝️ Confirmo que enviei apenas uma resposta.</span></label>
               <label class="check-item"><input type="checkbox" id="ck3"/><span>📞 Autorizo contato se estiver entre os vencedores.</span></label>
               <label class="check-item"><input type="checkbox" id="ck4"/><span>ℹ️ Ciente de que o YouTube não patrocina este desafio.</span></label>
+              <label class="check-item"><input type="checkbox" id="ck5"/><span>🔒 Li e concordo com a <a href="privacidade.html" target="_blank">Política de Privacidade</a> (LGPD).</span></label>
             </div>
             <button class="btn-send" id="btn-send" onclick="handleSubmit()">🚀 ENVIAR MINHA RESPOSTA</button>
           </div>
@@ -190,6 +187,11 @@
             <span class="trophy">😔</span>
             <div class="success-title" style="background:linear-gradient(135deg,#FF4500,#FF0000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Quase lá!</div>
             <p class="success-sub">Sua resposta foi registrada, mas não foi a correta.<br>Fique ligado no próximo desafio! 💪</p>
+          </div>
+          <div class="success-screen" id="dup-screen" style="display:none">
+            <span class="trophy">⚠️</span>
+            <div class="success-title" style="background:linear-gradient(135deg,#FF8C00,#FF4500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Você já participou!</div>
+            <p class="success-sub">Esse email já enviou uma resposta neste desafio.<br>Só vale uma por pessoa. 🤝</p>
           </div>
           <div class="closed-screen" id="closed-screen">
             <span class="closed-emoji">⌛</span>
@@ -211,25 +213,19 @@
       <div class="footer">
         <span>© 2025 Joga Junto</span>
         <a href="regulamento-jogajunto.pdf" download="Regulamento-JogaJunto.pdf">📋 Regulamento</a>
+        <a href="privacidade.html">🔒 Privacidade</a>
         <a href="mailto:comercialknp@gmail.com">Contato</a>
-        <a href="#">Vencedores anteriores</a>
       </div>
     </div>
   </div>
 
   <script>
-    // =====================================================
-    // CONFIGURAÇÕES — não precisa mais editar aqui!
-    // Use o painel admin em /admin.html
-    // =====================================================
     const SUPABASE_URL = 'https://xcwftyikbrioyrgrkiaj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
     const TOTAL_VAGAS = 10;
     const TOTAL_SECS  = 600;
 
     let DESAFIO = '', GABARITO = 0, CODIGO_SECRETO = '';
-    // =====================================================
-
     let ticker = null, done = false, fase = 'waiting';
     let remaining = TOTAL_SECS;
 
@@ -283,26 +279,6 @@
       fetchWinners();
     }
 
-
-
-    function tickDesafio(){
-      if(done) return;
-      remaining--;
-      const m=Math.floor(remaining/60), s=remaining%60;
-      const numsEl=document.getElementById('timer-nums');
-      const boxEl=document.getElementById('timer-box');
-      const fillEl=document.getElementById('progress-fill');
-      numsEl.textContent=pad(m)+':'+pad(s);
-      document.getElementById('timer-msg').textContent=getMsg(remaining);
-      fillEl.style.width=Math.round((remaining/TOTAL_SECS)*100)+'%';
-      numsEl.classList.remove('warning','danger'); boxEl.classList.remove('warning','danger'); fillEl.classList.remove('danger');
-      if(remaining<=30){numsEl.classList.add('danger');boxEl.classList.add('danger');fillEl.classList.add('danger');}
-      else if(remaining<=120){numsEl.classList.add('warning');boxEl.classList.add('warning');}
-      if(remaining<=0){ clearInterval(ticker); showClosed(); }
-    }
-
-
-
     function formatTime(iso){ return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
 
     function renderSlots(entries){
@@ -331,31 +307,48 @@
       }catch(e){}
     }
 
+    async function checkDuplicate(email, desafio){
+      try{
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/respostas?desafio=eq.${encodeURIComponent(desafio)}&email=eq.${encodeURIComponent(email)}&select=id&limit=1`,{
+          headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+        });
+        if(!res.ok) return false;
+        const arr = await res.json();
+        return arr.length > 0;
+      }catch(e){ return false; }
+    }
+
     async function handleSubmit(){
       const channel=document.getElementById('f-channel').value.trim();
       const link=document.getElementById('f-link').value.trim();
-      const email=document.getElementById('f-email').value.trim();
+      const email=document.getElementById('f-email').value.trim().toLowerCase();
       const answer=document.getElementById('f-answer').value.trim();
       const secret=document.getElementById('f-secret').value.trim().toUpperCase();
-      const checks=['ck1','ck2','ck3','ck4'].every(id=>document.getElementById(id).checked);
+      const checks=['ck1','ck2','ck3','ck4','ck5'].every(id=>document.getElementById(id).checked);
       const btn=document.getElementById('btn-send');
 
-      // Validação de campos
       if(!channel||!link||!email||!answer||!secret||!checks){
         btn.textContent='⚠️ Preencha tudo antes de enviar!';btn.classList.add('error');
         setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';btn.classList.remove('error');},2200);return;
       }
 
-      // Validação do código secreto
       if(secret !== CODIGO_SECRETO){
         btn.textContent='🔑 Código secreto incorreto!';btn.classList.add('error');
         setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';btn.classList.remove('error');},2500);return;
       }
 
-      // Validação da resposta
+      btn.textContent='🔍 Verificando...';btn.disabled=true;
+      const isDup = await checkDuplicate(email, DESAFIO);
+      if(isDup){
+        done=true;clearInterval(ticker);
+        document.getElementById('form-inner').style.display='none';
+        document.getElementById('dup-screen').style.display='block';
+        return;
+      }
+
       const respostaCorreta = parseInt(answer) === GABARITO;
 
-      btn.textContent='⏳ Enviando...';btn.disabled=true;
+      btn.textContent='⏳ Enviando...';
       try{
         const res=await fetch(`${SUPABASE_URL}/rest/v1/respostas`,{
           method:'POST',
@@ -371,6 +364,10 @@
             document.getElementById('wrong-screen').style.display='block';
           }
           fetchWinners();
+        } else if(res.status === 409){
+          done=true;clearInterval(ticker);
+          document.getElementById('form-inner').style.display='none';
+          document.getElementById('dup-screen').style.display='block';
         } else {
           btn.textContent='❌ Erro ao enviar. Tenta de novo!';btn.disabled=false;
           setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';},2500);
@@ -408,7 +405,6 @@
           CODIGO_SECRETO = c.codigo_secreto || '';
           const aberturaISO = c.abertura || new Date().toISOString();
 
-          // Atualizar UI com dados do desafio
           const chName = document.getElementById('ch-name');
           if(chName) chName.textContent = DESAFIO;
 
@@ -417,7 +413,6 @@
             if(prize) prize.textContent = '🎁 ' + c.premio;
           }
 
-          // Se inativo, mostrar tela de aguarde permanente
           if(!c.ativo) {
             showWaiting();
             document.getElementById('cd-h').textContent = '--';
@@ -428,7 +423,6 @@
             return;
           }
 
-          // Sobrescrever datas com as do banco
           const ABERTURA_DATE_DYN  = new Date(aberturaISO);
           const FECHAMENTO_DATE_DYN = new Date(ABERTURA_DATE_DYN.getTime() + TOTAL_SECS * 1000);
           const now = new Date();
