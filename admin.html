@@ -3,305 +3,307 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Joga Junto — Painel Admin</title>
+  <title>Admin — Joga Junto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { min-height: 100vh; background: #0d0d1a; font-family: 'Nunito', sans-serif; color: #fff; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    body { min-height: 100vh; background: #0d0d1a; font-family: 'Nunito', sans-serif; color: #fff; padding: 1.5rem 1rem 3rem; }
+    .wrap { max-width: 880px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 1.5rem; }
+    .title { font-family: 'Fredoka One', cursive; font-size: clamp(2rem,6vw,3rem); background: linear-gradient(135deg,#FFD700,#FF8C00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.25rem; }
+    .subtitle { font-size: 12px; color: #666; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
-    .login-screen { width: 100%; max-width: 380px; }
-    .admin-screen { width: 100%; max-width: 600px; display: none; }
+    .card { background: #161625; border: 2px solid #2a2a45; border-radius: 24px; padding: 1.75rem 1.5rem; margin-bottom: 1.25rem; }
+    .card-title { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #FFD700; margin-bottom: 1rem; display:flex; align-items:center; gap:8px; }
 
-    .logo { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #FFD700; text-align: center; margin-bottom: 0.25rem; }
-    .logo-sub { font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #444; text-align: center; margin-bottom: 2rem; }
+    .field { margin-bottom: 0.85rem; }
+    .field label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+    .field input, .field textarea, .field select { width: 100%; background: #0d0d1a; border: 2px solid #2a2a45; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #fff; outline: none; font-weight: 600; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: #FFD700; }
 
-    .card { background: #161625; border: 1.5px solid #2a2a45; border-radius: 20px; padding: 1.75rem; }
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; background:#0d0d1a; border:2px solid #2a2a45; border-radius: 12px; margin-bottom: 0.85rem; }
+    .toggle-row label { font-weight:700; font-size: 13px; color:#cbc7bd; }
+    .toggle { position:relative; width:50px; height:26px; background:#2a2a45; border-radius:13px; cursor:pointer; transition: background .2s; }
+    .toggle::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; background:#fff; border-radius:50%; transition: transform .2s; }
+    .toggle.on { background:linear-gradient(135deg,#FFD700,#FF8C00); }
+    .toggle.on::after { transform: translateX(24px); }
 
-    .section-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #FFD700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
 
-    .field { margin-bottom: 1.1rem; }
-    .field label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #555; margin-bottom: 6px; }
-    .field input, .field select { width: 100%; background: #0d0d1a; border: 1.5px solid #2a2a45; border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #fff; outline: none; transition: border-color 0.2s; font-weight: 600; }
-    .field input:focus, .field select:focus { border-color: #FFD700; }
-    .field input::placeholder { color: #2a2a45; }
-    .field select option { background: #161625; }
+    .btn { padding: 12px 18px; border: none; border-radius: 12px; font-family: 'Fredoka One', cursive; font-size: 14px; letter-spacing: 1px; cursor: pointer; }
+    .btn-primary { background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; }
+    .btn-danger { background: rgba(255,69,0,0.15); color: #FF8C00; border: 1px solid rgba(255,69,0,0.35); }
+    .btn-ghost { background: #1e1e30; color: #cbc7bd; border:1px solid #2a2a45; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .msg { padding: 12px 14px; border-radius: 12px; margin-top: 0.75rem; font-size: 13px; font-weight: 700; text-align: center; display:none; }
+    .msg.ok { background: rgba(0,230,100,0.15); color: #00e664; }
+    .msg.err { background: rgba(255,69,0,0.15); color: #FF8C00; }
 
-    .toggle-wrap { display: flex; align-items: center; justify-content: space-between; background: #0d0d1a; border: 1.5px solid #2a2a45; border-radius: 10px; padding: 11px 14px; }
-    .toggle-label { font-size: 13px; font-weight: 700; color: #888; }
-    .toggle { position: relative; width: 44px; height: 24px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; inset: 0; background: #2a2a45; border-radius: 24px; cursor: pointer; transition: 0.3s; }
-    .toggle-slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #555; border-radius: 50%; transition: 0.3s; }
-    .toggle input:checked + .toggle-slider { background: rgba(0,200,100,0.3); border: 1px solid #00C864; }
-    .toggle input:checked + .toggle-slider:before { background: #00C864; transform: translateX(20px); }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .status-badge.ativo  { background: rgba(0,230,100,0.15); color: #00e664; }
+    .status-badge.inativo { background: rgba(100,100,100,0.15); color: #888; }
 
-    .btn { width: 100%; padding: 13px; border: none; border-radius: 12px; font-family: 'Fredoka One', cursive; font-size: 1.2rem; letter-spacing: 2px; cursor: pointer; transition: transform 0.15s, opacity 0.2s; margin-top: 0.5rem; }
-    .btn-primary { background: linear-gradient(135deg, #FFD700, #FF8C00); color: #0d0d1a; }
-    .btn-primary:hover { transform: scale(1.02); }
-    .btn-primary:active { transform: scale(0.97); }
-    .btn-primary:disabled { background: #1e1e30; color: #333; cursor: not-allowed; transform: none; }
-    .btn-danger { background: rgba(255,70,70,0.15); color: #ff6464; border: 1.5px solid rgba(255,70,70,0.3); font-size: 0.9rem; margin-top: 0.75rem; }
-    .btn-danger:hover { background: rgba(255,70,70,0.25); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #2a2a45; }
+    th { color: #888; font-weight: 800; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+    td { color: #cbc7bd; }
+    .entrega-status { padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+    .es-pendente  { background: rgba(255,180,0,0.15); color: #FFB400; }
+    .es-enviado   { background: rgba(0,170,255,0.15); color: #4dbbff; }
+    .es-entregue  { background: rgba(0,230,100,0.15); color: #00e664; }
+    .es-cancelado { background: rgba(100,100,100,0.15); color: #888; }
 
-    .status-bar { padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 1rem; text-align: center; display: none; }
-    .status-bar.success { background: rgba(0,200,100,0.15); color: #00C864; border: 1px solid rgba(0,200,100,0.3); }
-    .status-bar.error { background: rgba(255,70,70,0.15); color: #ff6464; border: 1px solid rgba(255,70,70,0.3); }
-    .status-bar.loading { background: rgba(255,180,0,0.15); color: #FFB400; border: 1px solid rgba(255,180,0,0.3); }
-
-    .preview-bar { background: #0d0d1a; border: 1.5px solid #2a2a45; border-radius: 12px; padding: 12px 16px; margin-bottom: 1.5rem; display: none; }
-    .preview-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 6px; }
-    .preview-content { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .preview-item { font-size: 12px; font-weight: 700; }
-    .preview-item span { color: #FFD700; }
-
-    .divider { height: 1px; background: #1e1e30; margin: 1.25rem 0; }
-
-    .hint { font-size: 11px; color: #444; font-weight: 600; margin-top: 4px; }
-
-    .config-atual { background: rgba(255,180,0,0.08); border: 1px solid rgba(255,180,0,0.2); border-radius: 12px; padding: 12px 16px; margin-bottom: 1.5rem; }
-    .config-atual-title { font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #FFB400; margin-bottom: 8px; }
-    .config-atual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .config-atual-item { font-size: 12px; font-weight: 600; color: #666; }
-    .config-atual-item strong { color: #FFD700; font-weight: 700; }
-
-    .logout-btn { position: absolute; top: 1rem; right: 1rem; background: transparent; border: 1px solid #2a2a45; color: #555; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
-    .logout-btn:hover { border-color: #444; color: #888; }
-
-    body { position: relative; }
+    .login-card { max-width: 420px; margin: 4rem auto; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-
-  <!-- LOGIN -->
-  <div class="login-screen" id="login-screen">
-    <div class="logo">🎯 Joga Junto</div>
-    <p class="logo-sub">Painel Administrativo</p>
-    <div class="card">
-      <div class="field">
-        <label>🔐 Senha de acesso</label>
-        <input type="password" id="senha-input" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')fazerLogin()"/>
-      </div>
-      <button class="btn btn-primary" onclick="fazerLogin()">ENTRAR</button>
-      <div class="status-bar" id="login-status"></div>
+  <div class="wrap">
+    <div class="header">
+      <div class="title">🛠️ Admin</div>
+      <div class="subtitle">Joga Junto · painel de controle</div>
     </div>
-  </div>
 
-  <!-- ADMIN -->
-  <div class="admin-screen" id="admin-screen">
-    <button class="logout-btn" onclick="logout()">Sair</button>
+    <!-- LOGIN -->
+    <div class="card login-card" id="login-card">
+      <div class="card-title">🔐 Acesso restrito</div>
+      <div class="field"><label>Senha</label><input type="password" id="login-senha" placeholder="••••••••"/></div>
+      <button class="btn btn-primary" style="width:100%" onclick="login()">Entrar</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
 
-    <div class="logo">🎯 Joga Junto</div>
-    <p class="logo-sub" style="margin-bottom:1.5rem">Painel — configurar novo desafio</p>
+    <!-- PAINEL -->
+    <div id="painel" class="hidden">
+      <!-- CONFIG -->
+      <div class="card">
+        <div class="card-title">⚙️ Desafio atual <span id="status-cur" class="status-badge inativo">--</span></div>
 
-    <div class="card">
-      <div class="config-atual" id="config-atual" style="display:none">
-        <div class="config-atual-title">⚙️ Configuração atual no ar</div>
-        <div class="config-atual-grid" id="config-atual-grid"></div>
-      </div>
+        <div class="field"><label>📍 Nome do desafio</label><input type="text" id="cfg-desafio" placeholder="Parque Ibirapuera #02"/></div>
 
-      <div class="section-title">📋 Dados do desafio</div>
-
-      <div class="field">
-        <label>Nome do desafio</label>
-        <input type="text" id="f-desafio" placeholder="Ex: Parque Ibirapuera #02"/>
-        <p class="hint">Aparece no site e identifica o desafio no banco de dados</p>
-      </div>
-
-      <div class="field">
-        <label>🎁 Prêmio</label>
-        <input type="text" id="f-premio" placeholder="Ex: Fone Bluetooth JBL"/>
-      </div>
-
-      <div class="divider"></div>
-      <div class="section-title">⏰ Horário de abertura</div>
-
-      <div class="field-row">
-        <div class="field">
-          <label>📅 Data</label>
-          <input type="date" id="f-data"/>
+        <div class="row">
+          <div class="field"><label>🎁 Prêmio</label><input type="text" id="cfg-premio" placeholder="Fone Bluetooth"/></div>
+          <div class="field"><label>📅 Abertura</label><input type="datetime-local" id="cfg-abertura"/></div>
         </div>
-        <div class="field">
-          <label>🕐 Horário</label>
-          <input type="time" id="f-hora"/>
-          <p class="hint">Postagem + (duração × 2)</p>
+
+        <div class="row">
+          <div class="field"><label>🔢 Gabarito (resposta correta)</label><input type="number" id="cfg-gabarito" min="0"/></div>
+          <div class="field"><label>🤫 Código secreto</label><input type="text" id="cfg-codigo" placeholder="IBIRA02" style="text-transform:uppercase"/></div>
         </div>
+
+        <div class="toggle-row">
+          <label>Desafio ativo no site</label>
+          <div class="toggle" id="cfg-ativo" onclick="this.classList.toggle('on')"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="salvar()">💾 Salvar e ativar</button>
+          <button class="btn btn-ghost" onclick="carregar()">🔄 Recarregar</button>
+          <button class="btn btn-danger" onclick="limparGanhadores()">🧹 Zerar respostas</button>
+          <button class="btn btn-ghost" onclick="sair()" style="margin-left:auto">Sair</button>
+        </div>
+        <div class="msg" id="cfg-msg"></div>
       </div>
 
-      <div class="divider"></div>
-      <div class="section-title">🔐 Gabarito e código</div>
-
-      <div class="field-row">
-        <div class="field">
-          <label>🔢 Resposta correta (soma)</label>
-          <input type="number" id="f-gabarito" placeholder="Ex: 87" min="0"/>
-          <p class="hint">Só você sabe esse número!</p>
+      <!-- ENTREGAS -->
+      <div class="card">
+        <div class="card-title">📦 Entregas do desafio atual</div>
+        <div class="btn-row" style="margin-bottom: 0.75rem;">
+          <button class="btn btn-ghost" onclick="carregarEntregas()">🔄 Atualizar lista</button>
+          <button class="btn btn-ghost" onclick="exportarCSV()">📋 Exportar CSV</button>
         </div>
-        <div class="field">
-          <label>🤫 Código secreto</label>
-          <input type="text" id="f-codigo" placeholder="Ex: IBIRA02" style="text-transform:uppercase"/>
-          <p class="hint">Exibido no final do vídeo</p>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Cidade/UF</th>
+                <th>Rastreio</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ent-tbody">
+              <tr><td colspan="5" style="text-align:center;color:#555;padding:1rem;">Aguardando...</td></tr>
+            </tbody>
+          </table>
         </div>
+        <div class="msg" id="ent-msg"></div>
       </div>
-
-      <div class="divider"></div>
-
-      <div class="field">
-        <div class="toggle-wrap">
-          <span class="toggle-label">🟢 Ativar desafio no site agora</span>
-          <label class="toggle">
-            <input type="checkbox" id="f-ativo"/>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <p class="hint" style="margin-top:6px">Se desativado, o site fica em modo "Em breve" independente do horário</p>
-      </div>
-
-      <button class="btn btn-primary" id="btn-salvar" onclick="salvarConfig()">💾 SALVAR E ATIVAR</button>
-      <div class="status-bar" id="save-status"></div>
-
-      <div class="divider"></div>
-
-      <div class="section-title" style="margin-bottom:0.5rem">🗑️ Limpar ganhadores</div>
-      <p style="font-size:12px;color:#555;font-weight:600;margin-bottom:0.75rem">Remove todos os registros do desafio atual do banco de dados. Use antes de cada novo desafio.</p>
-      <button class="btn btn-danger" onclick="confirmarLimpeza()">Limpar lista de ganhadores do desafio atual</button>
-      <div class="status-bar" id="clear-status"></div>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://xcwftyikbrioyrgrkiaj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
-    const SENHA_ADMIN = 'jogajunto2025'; // <- mude para sua senha!
 
-    function showStatus(id, msg, tipo) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.className = 'status-bar ' + tipo;
-      el.style.display = 'block';
-      if(tipo !== 'loading') setTimeout(() => { el.style.display = 'none'; }, 4000);
+    let SENHA = sessionStorage.getItem('jj_senha') || '';
+    let ENTREGAS_CACHE = [];
+
+    function $(id){ return document.getElementById(id); }
+    function showMsg(elId, text, type){
+      const m = $(elId);
+      m.textContent = text;
+      m.className = 'msg ' + type;
+      m.style.display = 'block';
+      setTimeout(()=>{ m.style.display='none'; }, 4000);
     }
 
-    function fazerLogin() {
-      const senha = document.getElementById('senha-input').value;
-      if(senha === SENHA_ADMIN) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('admin-screen').style.display = 'block';
-        carregarConfig();
+    async function rpc(name, payload){
+      const res = await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name, {
+        method:'POST',
+        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      return res.json();
+    }
+
+    async function login(){
+      const s = $('login-senha').value.trim();
+      if(!s){ showMsg('login-msg','Digite a senha','err'); return; }
+      const r = await rpc('admin_get_config', { p_senha: s });
+      if(r.status === 'ok'){
+        SENHA = s;
+        sessionStorage.setItem('jj_senha', s);
+        $('login-card').classList.add('hidden');
+        $('painel').classList.remove('hidden');
+        preencherForm(r.data);
+        carregarEntregas();
       } else {
-        showStatus('login-status', '❌ Senha incorreta!', 'error');
-        document.getElementById('senha-input').value = '';
+        showMsg('login-msg','Senha incorreta','err');
       }
     }
 
-    function logout() {
-      document.getElementById('admin-screen').style.display = 'none';
-      document.getElementById('login-screen').style.display = 'block';
-      document.getElementById('senha-input').value = '';
+    function sair(){
+      sessionStorage.removeItem('jj_senha');
+      SENHA = '';
+      location.reload();
     }
 
-    async function carregarConfig() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/config?id=eq.1`, {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-        });
-        const data = await res.json();
-        if(data && data[0]) {
-          const c = data[0];
-          const grid = document.getElementById('config-atual-grid');
-          const abertura = c.abertura ? new Date(c.abertura).toLocaleString('pt-BR') : '—';
-          grid.innerHTML = `
-            <div class="config-atual-item">Desafio: <strong>${c.desafio || '—'}</strong></div>
-            <div class="config-atual-item">Prêmio: <strong>${c.premio || '—'}</strong></div>
-            <div class="config-atual-item">Abertura: <strong>${abertura}</strong></div>
-            <div class="config-atual-item">Código: <strong>${c.codigo_secreto || '—'}</strong></div>
-            <div class="config-atual-item">Gabarito: <strong>${c.gabarito ?? '—'}</strong></div>
-            <div class="config-atual-item">Status: <strong style="color:${c.ativo?'#00C864':'#ff6464'}">${c.ativo ? '✅ Ativo' : '⛔ Inativo'}</strong></div>
-          `;
-          document.getElementById('config-atual').style.display = 'block';
-
-          // Pré-preencher campos
-          if(c.desafio) document.getElementById('f-desafio').value = c.desafio;
-          if(c.premio) document.getElementById('f-premio').value = c.premio;
-          if(c.abertura) {
-            const d = new Date(c.abertura);
-            document.getElementById('f-data').value = d.toISOString().split('T')[0];
-            document.getElementById('f-hora').value = d.toTimeString().slice(0,5);
-          }
-          if(c.gabarito) document.getElementById('f-gabarito').value = c.gabarito;
-          if(c.codigo_secreto) document.getElementById('f-codigo').value = c.codigo_secreto;
-          document.getElementById('f-ativo').checked = c.ativo || false;
-        }
-      } catch(e) {}
+    function preencherForm(c){
+      $('cfg-desafio').value  = c.desafio || '';
+      $('cfg-premio').value   = c.premio || '';
+      $('cfg-gabarito').value = c.gabarito ?? '';
+      $('cfg-codigo').value   = c.codigo_secreto || '';
+      if(c.abertura){
+        const d = new Date(c.abertura);
+        const pad = n => String(n).padStart(2,'0');
+        $('cfg-abertura').value = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+      }
+      const toggle = $('cfg-ativo');
+      toggle.classList.toggle('on', !!c.ativo);
+      const badge = $('status-cur');
+      badge.textContent = c.ativo ? '● Ativo' : '● Inativo';
+      badge.className = 'status-badge ' + (c.ativo ? 'ativo' : 'inativo');
     }
 
-    async function salvarConfig() {
-      const desafio = document.getElementById('f-desafio').value.trim();
-      const premio  = document.getElementById('f-premio').value.trim();
-      const data    = document.getElementById('f-data').value;
-      const hora    = document.getElementById('f-hora').value;
-      const gabarito = document.getElementById('f-gabarito').value;
-      const codigo  = document.getElementById('f-codigo').value.trim().toUpperCase();
-      const ativo   = document.getElementById('f-ativo').checked;
+    async function carregar(){
+      const r = await rpc('admin_get_config', { p_senha: SENHA });
+      if(r.status === 'ok'){ preencherForm(r.data); showMsg('cfg-msg','Recarregado','ok'); }
+      else if(r.status === 'unauthorized'){ sair(); }
+    }
 
-      if(!desafio || !data || !hora || !gabarito || !codigo) {
-        showStatus('save-status', '⚠️ Preencha todos os campos obrigatórios!', 'error');
+    async function salvar(){
+      const ab = $('cfg-abertura').value;
+      const payload = {
+        p_senha: SENHA,
+        p_desafio: $('cfg-desafio').value.trim(),
+        p_abertura: ab ? new Date(ab).toISOString() : null,
+        p_premio: $('cfg-premio').value.trim(),
+        p_gabarito: parseInt($('cfg-gabarito').value) || 0,
+        p_codigo_secreto: $('cfg-codigo').value.trim().toUpperCase(),
+        p_ativo: $('cfg-ativo').classList.contains('on')
+      };
+      const r = await rpc('admin_save_config', payload);
+      if(r.status === 'ok'){
+        showMsg('cfg-msg','Config salva com sucesso!','ok');
+        carregar();
+      } else if(r.status === 'unauthorized'){ sair(); }
+      else { showMsg('cfg-msg','Erro ao salvar','err'); }
+    }
+
+    async function limparGanhadores(){
+      if(!confirm('Apagar TODAS as respostas do desafio atual?')) return;
+      const r = await rpc('admin_clear_winners', { p_senha: SENHA });
+      if(r.status === 'ok'){
+        showMsg('cfg-msg', r.removidas + ' respostas removidas', 'ok');
+        carregarEntregas();
+      } else if(r.status === 'unauthorized'){ sair(); }
+      else { showMsg('cfg-msg','Erro','err'); }
+    }
+
+    async function carregarEntregas(){
+      const r = await rpc('admin_list_entregas', { p_senha: SENHA });
+      if(r.status === 'unauthorized'){ sair(); return; }
+      ENTREGAS_CACHE = r.data || [];
+      renderEntregas();
+    }
+
+    function renderEntregas(){
+      const tbody = $('ent-tbody');
+      if(!ENTREGAS_CACHE.length){
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#555;padding:1rem;">Nenhuma entrega ainda</td></tr>';
         return;
       }
-
-      const abertura = new Date(`${data}T${hora}:00`).toISOString();
-      showStatus('save-status', '⏳ Salvando...', 'loading');
-      document.getElementById('btn-salvar').disabled = true;
-
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/config?id=eq.1`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': 'Bearer ' + SUPABASE_KEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ desafio, premio, abertura, gabarito: parseInt(gabarito), codigo_secreto: codigo, ativo })
-        });
-
-        if(res.ok || res.status === 204) {
-          showStatus('save-status', '✅ Configuração salva! O site já está atualizado.', 'success');
-          carregarConfig();
-        } else {
-          showStatus('save-status', '❌ Erro ao salvar. Tenta novamente.', 'error');
-        }
-      } catch(e) {
-        showStatus('save-status', '❌ Erro de conexão!', 'error');
-      }
-
-      document.getElementById('btn-salvar').disabled = false;
+      tbody.innerHTML = ENTREGAS_CACHE.map(e => `
+        <tr>
+          <td><strong>${escape(e.nome_completo)}</strong><br><span style="color:#555;font-size:11px;">${escape(e.email)}</span></td>
+          <td>${escape(e.cidade)}/${escape(e.uf)}<br><span style="color:#555;font-size:11px;">${escape(e.cep)}</span></td>
+          <td><input type="text" placeholder="Cód. rastreio" value="${escape(e.codigo_rastreio||'')}" id="ras-${e.id}" style="width:130px;background:#0d0d1a;border:1px solid #2a2a45;color:#fff;padding:6px 8px;border-radius:8px;font-size:11px;"/></td>
+          <td><span class="entrega-status es-${e.status}">${e.status}</span></td>
+          <td>
+            <select onchange="atualizarStatus('${e.id}', this.value)" style="background:#0d0d1a;border:1px solid #2a2a45;color:#fff;padding:6px;border-radius:8px;font-size:11px;">
+              <option value="">Status...</option>
+              <option value="pendente">Pendente</option>
+              <option value="enviado">Enviado</option>
+              <option value="entregue">Entregue</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
     }
 
-    async function confirmarLimpeza() {
-      const desafio = document.getElementById('f-desafio').value.trim();
-      if(!desafio) { showStatus('clear-status', '⚠️ Define o nome do desafio antes de limpar!', 'error'); return; }
-      if(!confirm(`Tem certeza que deseja apagar todos os registros de "${desafio}"? Esta ação não pode ser desfeita.`)) return;
+    function escape(s){ return String(s||'').replace(/[<>&"]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]); }
 
-      showStatus('clear-status', '⏳ Limpando...', 'loading');
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/respostas?desafio=eq.${encodeURIComponent(desafio)}`, {
-          method: 'DELETE',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-        });
-        if(res.ok || res.status === 204) {
-          showStatus('clear-status', '✅ Lista limpa com sucesso!', 'success');
-        } else {
-          showStatus('clear-status', '❌ Erro ao limpar.', 'error');
-        }
-      } catch(e) {
-        showStatus('clear-status', '❌ Erro de conexão!', 'error');
-      }
+    async function atualizarStatus(id, status){
+      if(!status) return;
+      const rastreio = $('ras-'+id).value.trim();
+      const r = await rpc('admin_update_entrega_status', { p_senha: SENHA, p_entrega_id: id, p_status: status, p_codigo_rastreio: rastreio });
+      if(r.status === 'ok'){ showMsg('ent-msg','Status atualizado','ok'); carregarEntregas(); }
+      else if(r.status === 'unauthorized'){ sair(); }
+      else { showMsg('ent-msg','Erro','err'); }
     }
 
-    // Preenche data de hoje por padrão
-    document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+    function exportarCSV(){
+      if(!ENTREGAS_CACHE.length){ showMsg('ent-msg','Nada pra exportar','err'); return; }
+      const cols = ['nome_completo','email','cpf','telefone','cep','logradouro','numero','complemento','bairro','cidade','uf','status','codigo_rastreio','criado_em'];
+      const header = cols.join(';');
+      const rows = ENTREGAS_CACHE.map(e => cols.map(c => '"'+String(e[c]||'').replace(/"/g,'""')+'"').join(';'));
+      const csv = '﻿' + header + '\n' + rows.join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'entregas-jogajunto.csv';
+      a.click();
+    }
+
+    // Auto-login se senha cached
+    if(SENHA){
+      rpc('admin_get_config', { p_senha: SENHA }).then(r => {
+        if(r.status === 'ok'){
+          $('login-card').classList.add('hidden');
+          $('painel').classList.remove('hidden');
+          preencherForm(r.data);
+          carregarEntregas();
+        } else {
+          sessionStorage.removeItem('jj_senha');
+        }
+      });
+    }
   </script>
 </body>
 </html>
