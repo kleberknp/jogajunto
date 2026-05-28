@@ -39,6 +39,10 @@
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
+    .btn-vagas { flex: 1; padding: 12px; background: #0d0d1a; border: 2px solid #2a2a45; color: #cbc7bd; border-radius: 12px; font-family: 'Fredoka One', cursive; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+    .btn-vagas:hover { border-color: #FFD700; }
+    .btn-vagas.active { background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; border-color: transparent; }
+
     .msg { padding: 12px 14px; border-radius: 12px; margin-top: 0.75rem; font-size: 13px; font-weight: 700; text-align: center; display:none; }
     .msg.ok { background: rgba(0,230,100,0.15); color: #00e664; }
     .msg.err { background: rgba(255,69,0,0.15); color: #FF8C00; }
@@ -94,6 +98,14 @@
           <div class="field"><label>🤫 Código secreto</label><input type="text" id="cfg-codigo" placeholder="IBIRA02" style="text-transform:uppercase"/></div>
         </div>
 
+        <div class="field">
+          <label>🏆 Quantidade de vencedores</label>
+          <div style="display:flex;gap:10px;">
+            <button type="button" class="btn-vagas" data-val="5"  onclick="setVagas(5)">5 vencedores</button>
+            <button type="button" class="btn-vagas" data-val="10" onclick="setVagas(10)">10 vencedores</button>
+          </div>
+        </div>
+
         <div class="toggle-row">
           <label>Desafio ativo no site</label>
           <div class="toggle" id="cfg-ativo" onclick="this.classList.toggle('on')"></div>
@@ -142,6 +154,14 @@
 
     let SENHA = sessionStorage.getItem('jj_senha') || '';
     let ENTREGAS_CACHE = [];
+    let TOTAL_VENCEDORES = 10;
+
+    function setVagas(n){
+      TOTAL_VENCEDORES = n;
+      document.querySelectorAll('.btn-vagas').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.val) === n);
+      });
+    }
 
     function $(id){ return document.getElementById(id); }
     function showMsg(elId, text, type){
@@ -198,6 +218,7 @@
       const badge = $('status-cur');
       badge.textContent = c.ativo ? '● Ativo' : '● Inativo';
       badge.className = 'status-badge ' + (c.ativo ? 'ativo' : 'inativo');
+      setVagas(c.total_vencedores || 10);
     }
 
     async function carregar(){
@@ -215,7 +236,8 @@
         p_premio: $('cfg-premio').value.trim(),
         p_gabarito: parseInt($('cfg-gabarito').value) || 0,
         p_codigo_secreto: $('cfg-codigo').value.trim().toUpperCase(),
-        p_ativo: $('cfg-ativo').classList.contains('on')
+        p_ativo: $('cfg-ativo').classList.contains('on'),
+        p_total_vencedores: TOTAL_VENCEDORES
       };
       const r = await rpc('admin_save_config', payload);
       if(r.status === 'ok'){
