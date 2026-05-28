@@ -126,7 +126,7 @@
       <div class="challenge-pill">
         <span style="font-size:14px;font-weight:700;">📍 <span id="ch-name">Parque Ibirapuera #01</span></span>
         <span class="pill-sep">·</span>
-        <span class="prize-tag">🎁 Prêmio para os 10 primeiros</span>
+        <span class="prize-tag" id="prize-tag">🎁 Prêmio para os 10 primeiros</span>
         <span class="pill-sep">·</span>
         <span class="status-tag waiting" id="status-tag">⏳ Em breve</span>
       </div>
@@ -223,7 +223,7 @@
   <script>
     const SUPABASE_URL = 'https://xcwftyikbrioyrgrkiaj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
-    const TOTAL_VAGAS = 10;
+    let TOTAL_VAGAS = 10;
     const TOTAL_SECS  = 600;
 
     let DESAFIO = '';
@@ -385,14 +385,18 @@
 
     async function carregarConfigEIniciar() {
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/config?id=eq.1&select=desafio,abertura,premio,ativo`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/config?id=eq.1&select=desafio,abertura,premio,ativo,total_vencedores`, {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
         });
         const data = await res.json();
         if(data && data[0]) {
           const c = data[0];
           DESAFIO        = c.desafio || '';
+          TOTAL_VAGAS    = c.total_vencedores || 10;
           const aberturaISO = c.abertura || new Date().toISOString();
+
+          const ptag = document.getElementById('prize-tag');
+          if(ptag) ptag.textContent = '🎁 Prêmio para os ' + TOTAL_VAGAS + ' primeiros';
 
           const chName = document.getElementById('ch-name');
           if(chName) chName.textContent = DESAFIO;
