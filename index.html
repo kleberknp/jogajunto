@@ -20,6 +20,7 @@
     @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+    @keyframes btn-ready-pulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(0,230,100,0.4); } 50% { transform: scale(1.04); box-shadow: 0 0 45px rgba(0,230,100,0.85); } }
 
     .wrapper { position: relative; z-index: 1; }
     .layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; max-width: 900px; margin: 0 auto; align-items: start; }
@@ -63,7 +64,8 @@
     .progress-fill.danger { background: linear-gradient(90deg,#FF8C00,#FF4500); }
 
     .form-card { background: #161625; border: 2px solid #2a2a45; border-radius: 24px; padding: 1.5rem; animation: pop 0.6s 0.3s ease both; display: none; }
-    .form-title { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #FFD700; margin-bottom: 1rem; text-align: center; }
+    .form-title { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: #FFD700; margin-bottom: 0.5rem; text-align: center; }
+    .form-hint { font-size: 12px; color: #888; font-weight: 600; text-align: center; margin-bottom: 1rem; line-height: 1.5; }
     .field { margin-bottom: 0.9rem; }
     .field label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
     .field input { width: 100%; background: #0d0d1a; border: 2px solid #2a2a45; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-family: 'Nunito', sans-serif; color: #fff; outline: none; transition: border-color 0.2s; font-weight: 600; }
@@ -77,10 +79,12 @@
     .check-item input[type=checkbox] { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; accent-color: #FFD700; cursor: pointer; }
     .check-item span { font-size: 12px; color: #666; line-height: 1.5; font-weight: 600; }
     .check-item a { color: #FFD700; text-decoration: underline; }
-    .btn-send { width: 100%; padding: 14px; background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.3rem; letter-spacing: 2px; cursor: pointer; transition: transform 0.15s; }
+    .btn-send { width: 100%; padding: 16px; background: linear-gradient(135deg,#FFD700,#FF8C00); color: #0d0d1a; border: none; border-radius: 14px; font-family: 'Fredoka One', cursive; font-size: 1.3rem; letter-spacing: 2px; cursor: pointer; transition: transform 0.15s; }
     .btn-send:hover { transform: scale(1.02); }
     .btn-send:active { transform: scale(0.97); }
-    .btn-send:disabled { background: #1e1e30; color: #333; cursor: not-allowed; transform: none; }
+    .btn-send:disabled { cursor: not-allowed; transform: none; }
+    .btn-send.locked { background: #1e1e30; color: #FFB400; border: 2px dashed #3a3a55; }
+    .btn-send.ready { background: linear-gradient(135deg,#00e664,#00b34d); color: #fff; animation: btn-ready-pulse 1s infinite; }
     .btn-send.error { background: linear-gradient(135deg,#FF4500,#FF0000); animation: shake 0.4s ease; }
 
     .success-screen { display: none; text-align: center; padding: 2rem 1rem; animation: fadeIn 0.5s ease; }
@@ -134,8 +138,8 @@
       <div class="main-col">
 
         <div class="waiting-box" id="waiting-box">
-          <div class="waiting-title">🎬 Assiste o vídeo enquanto isso!</div>
-          <div class="waiting-sub">O desafio abre automaticamente em:</div>
+          <div class="waiting-title">⌨️ Preencha tudo agora!</div>
+          <div class="waiting-sub">O botão de enviar libera em:</div>
           <div class="countdown-parts">
             <div class="countdown-part">
               <div class="countdown-part-num" id="cd-h">00</div>
@@ -163,7 +167,8 @@
 
         <div class="form-card" id="form-card">
           <div id="form-inner">
-            <div class="form-title">✍️ Manda sua resposta!</div>
+            <div class="form-title">✍️ Preencha enquanto espera!</div>
+            <div class="form-hint">Deixa tudo pronto. Quando der a hora, é só apertar ENVIAR — quem clicar mais rápido entra no ranking! 🏆</div>
             <div class="field"><label>📺 Nome do seu canal</label><input type="text" id="f-channel" placeholder="Ex: Canal da Maria"/></div>
             <div class="field"><label>🔗 Link ou @ do canal</label><input type="text" id="f-link" placeholder="@seucanal"/></div>
             <div class="field"><label>📧 E-mail para contato</label><input type="email" id="f-email" placeholder="seuemail@gmail.com"/></div>
@@ -176,7 +181,7 @@
               <label class="check-item"><input type="checkbox" id="ck4"/><span>ℹ️ Ciente de que o YouTube não patrocina este desafio.</span></label>
               <label class="check-item"><input type="checkbox" id="ck5"/><span>🔒 Li e concordo com a <a href="privacidade.html" target="_blank">Política de Privacidade</a> (LGPD).</span></label>
             </div>
-            <button class="btn-send" id="btn-send" onclick="handleSubmit()">🚀 ENVIAR MINHA RESPOSTA</button>
+            <button class="btn-send locked" id="btn-send" disabled onclick="handleSubmit()">🔒 Aguarde a abertura...</button>
           </div>
           <div class="success-screen" id="success-screen">
             <span class="trophy">🏆</span>
@@ -227,8 +232,7 @@
     const TOTAL_SECS  = 600;
 
     let DESAFIO = '';
-    let ticker = null, done = false, fase = 'waiting';
-    let remaining = TOTAL_SECS;
+    let cronTicker = null, done = false, fase = 'waiting';
 
     function pad(n){ return String(n).padStart(2,'0'); }
 
@@ -243,26 +247,53 @@
     ];
     function getMsg(t){ for(let i=timerMsgs.length-1;i>=0;i--){if(t<=timerMsgs[i][0])return timerMsgs[i][1];}return timerMsgs[0][1]; }
 
-    function showWaiting(){
+    // Fase de espera: formulário liberado pra preencher, botão BLOQUEADO
+    function showWaiting(showForm){
       fase = 'waiting';
       document.getElementById('waiting-box').style.display = 'block';
       document.getElementById('timer-box').style.display = 'none';
-      document.getElementById('form-card').style.display = 'none';
+      document.getElementById('form-card').style.display = showForm ? 'block' : 'none';
+      if(showForm){
+        document.getElementById('form-inner').style.display = 'block';
+        const btn = document.getElementById('btn-send');
+        btn.disabled = true;
+        btn.classList.add('locked');
+        btn.classList.remove('ready','error');
+        btn.textContent = '🔒 Aguarde a abertura...';
+        const ft = document.querySelector('.form-title');
+        if(ft) ft.textContent = '✍️ Preencha enquanto espera!';
+      }
       const st = document.getElementById('status-tag');
       st.textContent = '⏳ Em breve';
       st.className = 'status-tag waiting';
       document.getElementById('loading-msg').textContent = 'Aguardando início...';
     }
 
-    function showOpen(){
+    // Abertura: desbloqueia o botão de enviar + inicia cronômetro de fechamento
+    function abrirEnvio(fechamento){
       fase = 'open';
       document.getElementById('waiting-box').style.display = 'none';
       document.getElementById('timer-box').style.display = 'block';
       document.getElementById('form-card').style.display = 'block';
+      document.getElementById('form-inner').style.display = 'block';
+
+      const btn = document.getElementById('btn-send');
+      btn.disabled = false;
+      btn.classList.remove('locked','error');
+      btn.classList.add('ready');
+      btn.textContent = '🚀 ENVIAR AGORA!';
+
+      const ft = document.querySelector('.form-title');
+      if(ft) ft.textContent = '🔥 É AGORA! Aperta enviar!';
+      const fh = document.querySelector('.form-hint');
+      if(fh) fh.style.display = 'none';
+
       const st = document.getElementById('status-tag');
       st.textContent = '● Aberto';
       st.className = 'status-tag';
+
       fetchWinners();
+      startCronometro(fechamento);
     }
 
     function showClosed(){
@@ -317,12 +348,15 @@
       const checks=['ck1','ck2','ck3','ck4','ck5'].every(id=>document.getElementById(id).checked);
       const btn=document.getElementById('btn-send');
 
+      // trava: só envia se já abriu
+      if(fase !== 'open'){ return; }
+
       if(!channel||!link||!email||!answer||!secret||!checks){
-        btn.textContent='⚠️ Preencha tudo antes de enviar!';btn.classList.add('error');
-        setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';btn.classList.remove('error');},2200);return;
+        btn.textContent='⚠️ Preencha tudo antes!';btn.classList.add('error');btn.classList.remove('ready');
+        setTimeout(()=>{btn.textContent='🚀 ENVIAR AGORA!';btn.classList.remove('error');btn.classList.add('ready');},2200);return;
       }
 
-      btn.textContent='⏳ Enviando...';btn.disabled=true;
+      btn.textContent='⏳ Enviando...';btn.disabled=true;btn.classList.remove('ready');
       try{
         const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_resposta`,{
           method:'POST',
@@ -339,33 +373,33 @@
         const status = data && data.status;
 
         if(status === 'correct'){
-          done=true;clearInterval(ticker);
+          done=true;clearInterval(cronTicker);
           document.getElementById('form-inner').style.display='none';
           document.getElementById('success-screen').style.display='block';
           fetchWinners();
         } else if(status === 'wrong_answer'){
-          done=true;clearInterval(ticker);
+          done=true;clearInterval(cronTicker);
           document.getElementById('form-inner').style.display='none';
           document.getElementById('wrong-screen').style.display='block';
           fetchWinners();
         } else if(status === 'duplicate'){
-          done=true;clearInterval(ticker);
+          done=true;clearInterval(cronTicker);
           document.getElementById('form-inner').style.display='none';
           document.getElementById('dup-screen').style.display='block';
         } else if(status === 'wrong_code'){
           btn.textContent='🔑 Código secreto incorreto!';btn.classList.add('error');btn.disabled=false;
-          setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';btn.classList.remove('error');},2500);
+          setTimeout(()=>{btn.textContent='🚀 ENVIAR AGORA!';btn.classList.remove('error');btn.classList.add('ready');},2500);
         } else if(status === 'closed' || status === 'not_open'){
-          done=true;clearInterval(ticker);
+          done=true;clearInterval(cronTicker);
           document.getElementById('form-inner').style.display='none';
           document.getElementById('closed-screen').style.display='block';
         } else {
-          btn.textContent='❌ Erro ao enviar. Tenta de novo!';btn.disabled=false;
-          setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';},2500);
+          btn.textContent='❌ Erro. Tenta de novo!';btn.disabled=false;
+          setTimeout(()=>{btn.textContent='🚀 ENVIAR AGORA!';btn.classList.add('ready');},2500);
         }
       }catch(e){
         btn.textContent='❌ Erro de conexão!';btn.disabled=false;
-        setTimeout(()=>{btn.textContent='🚀 ENVIAR MINHA RESPOSTA';},2500);
+        setTimeout(()=>{btn.textContent='🚀 ENVIAR AGORA!';btn.classList.add('ready');},2500);
       }
     }
 
@@ -401,13 +435,9 @@
           const chName = document.getElementById('ch-name');
           if(chName) chName.textContent = DESAFIO;
 
-          if(c.premio) {
-            const prize = document.getElementById('prize-badge');
-            if(prize) prize.textContent = '🎁 ' + c.premio;
-          }
-
+          // Desafio inativo: sem formulário, só aviso
           if(!c.ativo) {
-            showWaiting();
+            showWaiting(false);
             document.getElementById('cd-h').textContent = '--';
             document.getElementById('cd-m').textContent = '--';
             document.getElementById('cd-s').textContent = '--';
@@ -421,30 +451,36 @@
           const now = new Date();
 
           if(now < ABERTURA_DATE_DYN) {
-            showWaiting();
+            // ESPERA: form liberado pra preencher, botão bloqueado com contagem
+            showWaiting(true);
+            const btn = document.getElementById('btn-send');
             const tickCD = setInterval(() => {
               const diff = ABERTURA_DATE_DYN - new Date();
-              if(diff <= 0) { clearInterval(tickCD); startDesafioDyn(ABERTURA_DATE_DYN, FECHAMENTO_DATE_DYN); return; }
-              document.getElementById('cd-h').textContent = String(Math.floor(diff/3600000)).padStart(2,'0');
-              document.getElementById('cd-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-              document.getElementById('cd-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-            }, 1000);
+              if(diff <= 0) { clearInterval(tickCD); abrirEnvio(FECHAMENTO_DATE_DYN); return; }
+              const hh = Math.floor(diff/3600000);
+              const mm = Math.floor((diff%3600000)/60000);
+              const ss = Math.floor((diff%60000)/1000);
+              document.getElementById('cd-h').textContent = pad(hh);
+              document.getElementById('cd-m').textContent = pad(mm);
+              document.getElementById('cd-s').textContent = pad(ss);
+              btn.textContent = '🔒 LIBERA EM ' + (hh>0 ? pad(hh)+':' : '') + pad(mm) + ':' + pad(ss);
+            }, 250);
           } else if(now < FECHAMENTO_DATE_DYN) {
-            startDesafioDyn(ABERTURA_DATE_DYN, FECHAMENTO_DATE_DYN);
+            // já aberto
+            abrirEnvio(FECHAMENTO_DATE_DYN);
           } else {
             showClosed();
           }
         }
-      } catch(e) { showWaiting(); console.error('Erro ao carregar config:', e); }
+      } catch(e) { showWaiting(false); console.error('Erro ao carregar config:', e); }
     }
 
-    function startDesafioDyn(abertura, fechamento) {
-      showOpen();
+    function startCronometro(fechamento) {
       let rem = Math.max(0, Math.floor((fechamento - new Date()) / 1000));
       if(rem <= 0) { showClosed(); return; }
-      const t = setInterval(() => {
-        if(done) { clearInterval(t); return; }
-        rem--;
+      const tick = () => {
+        if(done) { clearInterval(cronTicker); return; }
+        rem = Math.max(0, Math.floor((fechamento - new Date()) / 1000));
         const m=Math.floor(rem/60), s=rem%60;
         const numsEl=document.getElementById('timer-nums');
         const boxEl=document.getElementById('timer-box');
@@ -455,8 +491,10 @@
         numsEl.classList.remove('warning','danger'); boxEl.classList.remove('warning','danger'); fillEl.classList.remove('danger');
         if(rem<=30){numsEl.classList.add('danger');boxEl.classList.add('danger');fillEl.classList.add('danger');}
         else if(rem<=120){numsEl.classList.add('warning');boxEl.classList.add('warning');}
-        if(rem<=0){ clearInterval(t); showClosed(); }
-      }, 1000);
+        if(rem<=0){ clearInterval(cronTicker); showClosed(); }
+      };
+      tick();
+      cronTicker = setInterval(tick, 1000);
       setInterval(fetchWinners, 5000);
     }
   </script>
