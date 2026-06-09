@@ -120,6 +120,33 @@
         <div class="msg" id="cfg-msg"></div>
       </div>
 
+      <!-- GANHADORES -->
+      <div class="card">
+        <div class="card-title">🏆 Ganhadores <span id="gan-count" style="font-size:13px;color:#888;font-family:'Nunito',sans-serif;font-weight:700;"></span></div>
+        <div class="btn-row" style="margin-bottom: 0.75rem;">
+          <button class="btn btn-ghost" onclick="carregarGanhadores()">🔄 Atualizar</button>
+          <button class="btn btn-ghost" onclick="exportarGanhadoresCSV()">📋 Exportar CSV</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Canal</th>
+                <th>Link/@</th>
+                <th>Email</th>
+                <th>Horário</th>
+                <th>Contatado</th>
+              </tr>
+            </thead>
+            <tbody id="gan-tbody">
+              <tr><td colspan="6" style="text-align:center;color:#555;padding:1rem;">Aguardando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="msg" id="gan-msg"></div>
+      </div>
+
       <!-- ENTREGAS -->
       <div class="card">
         <div class="card-title">📦 Entregas do desafio atual</div>
@@ -191,6 +218,7 @@
         $('login-card').classList.add('hidden');
         $('painel').classList.remove('hidden');
         preencherForm(r.data);
+        carregarGanhadores();
         carregarEntregas();
       } else {
         showMsg('login-msg','Senha incorreta','err');
@@ -313,6 +341,59 @@
       a.click();
     }
 
+    let GANHADORES_CACHE = [];
+
+    async function carregarGanhadores(){
+      const r = await rpc('admin_list_ganhadores', { p_senha: SENHA });
+      if(r.status === 'unauthorized'){ sair(); return; }
+      GANHADORES_CACHE = r.data || [];
+      const count = $('gan-count');
+      if(count) count.textContent = GANHADORES_CACHE.length + ' / ' + (r.total_vencedores||'?') + ' vagas';
+      renderGanhadores();
+    }
+
+    function renderGanhadores(){
+      const tbody = $('gan-tbody');
+      if(!GANHADORES_CACHE.length){
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#555;padding:1rem;">Nenhum ganhador ainda</td></tr>';
+        return;
+      }
+      tbody.innerHTML = GANHADORES_CACHE.map(g => `
+        <tr>
+          <td><strong style="color:#FFD700;">${g.posicao}º</strong></td>
+          <td><strong>${escape(g.canal_nome)}</strong></td>
+          <td style="color:#888;font-size:12px;">${escape(g.canal_link)}</td>
+          <td>${escape(g.email)}</td>
+          <td style="font-size:11px;color:#888;">${new Date(g.criado_em).toLocaleString('pt-BR')}</td>
+          <td>
+            <button class="btn ${g.vencedor ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px;font-size:12px;"
+              onclick="toggleVencedor('${g.id}', ${!g.vencedor})">
+              ${g.vencedor ? '✅ Sim' : '⬜ Não'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function toggleVencedor(id, val){
+      const r = await rpc('admin_mark_vencedor', { p_senha: SENHA, p_id: id, p_vencedor: val });
+      if(r.status === 'ok'){ carregarGanhadores(); showMsg('gan-msg', val ? 'Marcado como contatado' : 'Desmarcado', 'ok'); }
+      else if(r.status === 'unauthorized'){ sair(); }
+    }
+
+    function exportarGanhadoresCSV(){
+      if(!GANHADORES_CACHE.length){ showMsg('gan-msg','Nada pra exportar','err'); return; }
+      const cols = ['posicao','canal_nome','canal_link','email','criado_em','vencedor'];
+      const header = cols.join(';');
+      const rows = GANHADORES_CACHE.map(g => cols.map(c => '"'+String(g[c]||'').replace(/"/g,'""')+'"').join(';'));
+      const csv = '﻿' + header + '\n' + rows.join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ganhadores-jogajunto.csv';
+      a.click();
+    }
+
     // Auto-login se senha cached
     if(SENHA){
       rpc('admin_get_config', { p_senha: SENHA }).then(r => {
@@ -320,6 +401,7 @@
           $('login-card').classList.add('hidden');
           $('painel').classList.remove('hidden');
           preencherForm(r.data);
+          carregarGanhadores();
           carregarEntregas();
         } else {
           sessionStorage.removeItem('jj_senha');
