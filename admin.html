@@ -280,7 +280,7 @@
       if(!confirm('Apagar TODAS as respostas do desafio atual?')) return;
       const r = await rpc('admin_clear_winners', { p_senha: SENHA });
       if(r.status === 'ok'){
-        showMsg('cfg-msg', r.removidas + ' respostas removidas', 'ok');
+        showMsg('cfg-msg', r.removidas + ' respostas + ' + (r.entregas_removidas||0) + ' entregas removidas', 'ok');
         carregarEntregas();
       } else if(r.status === 'unauthorized'){ sair(); }
       else { showMsg('cfg-msg','Erro','err'); }
