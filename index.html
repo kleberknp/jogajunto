@@ -72,7 +72,7 @@
     .field input:focus { border-color: #FFD700; }
     .field input::placeholder { color: #2a2a45; }
     .answer-field input { font-family: 'Fredoka One', cursive; font-size: 2rem; text-align: center; letter-spacing: 6px; color: #FFD700; border-color: #FFD700; padding: 12px; }
-    .secret-field input { font-family: 'Fredoka One', cursive; letter-spacing: 4px; text-align: center; font-size: 1.1rem; color: #FF8C00; }
+
     .checks { margin: 1rem 0; display: flex; flex-direction: column; gap: 6px; }
     .check-item { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; padding: 6px 8px; border-radius: 8px; transition: background 0.15s; }
     .check-item:hover { background: rgba(255,215,0,0.05); }
@@ -173,7 +173,6 @@
             <div class="field"><label>🔗 Link ou @ do canal</label><input type="text" id="f-link" placeholder="@seucanal"/></div>
             <div class="field"><label>📧 E-mail para contato</label><input type="email" id="f-email" placeholder="seuemail@gmail.com"/></div>
             <div class="field answer-field"><label>🔢 Sua resposta final</label><input type="number" id="f-answer" placeholder="?" min="0"/></div>
-            <div class="field secret-field"><label>🤫 Código secreto do vídeo</label><input type="text" id="f-secret" placeholder="CÓDIGO" style="text-transform:uppercase"/></div>
             <div class="checks">
               <label class="check-item"><input type="checkbox" id="ck1"/><span>✅ Li e aceito o <a href="regulamento-jogajunto.pdf" target="_blank">regulamento</a> do desafio.</span></label>
               <label class="check-item"><input type="checkbox" id="ck2"/><span>☝️ Confirmo que enviei apenas uma resposta.</span></label>
@@ -344,14 +343,13 @@
       const link=document.getElementById('f-link').value.trim();
       const email=document.getElementById('f-email').value.trim().toLowerCase();
       const answer=document.getElementById('f-answer').value.trim();
-      const secret=document.getElementById('f-secret').value.trim().toUpperCase();
       const checks=['ck1','ck2','ck3','ck4','ck5'].every(id=>document.getElementById(id).checked);
       const btn=document.getElementById('btn-send');
 
       // trava: só envia se já abriu
       if(fase !== 'open'){ return; }
 
-      if(!channel||!link||!email||!answer||!secret||!checks){
+      if(!channel||!link||!email||!answer||!checks){
         btn.textContent='⚠️ Preencha tudo antes!';btn.classList.add('error');btn.classList.remove('ready');
         setTimeout(()=>{btn.textContent='🚀 ENVIAR AGORA!';btn.classList.remove('error');btn.classList.add('ready');},2200);return;
       }
@@ -365,8 +363,7 @@
             p_canal_nome: channel,
             p_canal_link: link,
             p_email: email,
-            p_resposta: parseInt(answer),
-            p_codigo: secret
+            p_resposta: parseInt(answer)
           })
         });
         const data = await res.json();
@@ -386,9 +383,6 @@
           done=true;clearInterval(cronTicker);
           document.getElementById('form-inner').style.display='none';
           document.getElementById('dup-screen').style.display='block';
-        } else if(status === 'wrong_code'){
-          btn.textContent='🔑 Código secreto incorreto!';btn.classList.add('error');btn.disabled=false;
-          setTimeout(()=>{btn.textContent='🚀 ENVIAR AGORA!';btn.classList.remove('error');btn.classList.add('ready');},2500);
         } else if(status === 'closed' || status === 'not_open'){
           done=true;clearInterval(cronTicker);
           document.getElementById('form-inner').style.display='none';
