@@ -115,6 +115,13 @@
     const SUPABASE_URL = 'https://xcwftyikbrioyrgrkiaj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
 
+    const TOKEN = new URLSearchParams(window.location.search).get('token') || '';
+
+    // Sem token: bloqueia a página inteira
+    if(!TOKEN){
+      document.getElementById('form-card').innerHTML = '<div style="text-align:center;padding:2rem 0"><span style="font-size:3rem">🔒</span><div style="font-family:\'Fredoka One\',cursive;font-size:1.5rem;color:#FF4500;margin:0.75rem 0">Link inválido</div><p style="color:#666;font-size:13px;font-weight:600">Este link não é válido ou já foi utilizado.<br>Se você ganhou, aguarde o contato pelo e-mail cadastrado.</p></div>';
+    }
+
     function val(id){ return document.getElementById(id).value.trim(); }
 
     function toggleResponsavel(){
@@ -147,6 +154,7 @@
     async function submit(){
       const btn = document.getElementById('btn');
       const payload = {
+        p_token: TOKEN,
         p_email: val('f-email').toLowerCase(),
         p_nome_completo: val('f-nome'),
         p_cpf: val('f-cpf'),
@@ -186,6 +194,8 @@
         if(data.status === 'ok'){
           document.getElementById('form-card').style.display = 'none';
           document.getElementById('success').style.display = 'block';
+        } else if(data.status === 'invalid_token'){
+          showMsg('❌ Link inválido ou já utilizado.', 'err');
         } else if(data.status === 'not_winner'){
           showMsg('❌ Esse e-mail nao consta entre vencedores. Conferir cadastro?', 'err');
         } else if(data.status === 'already_submitted'){

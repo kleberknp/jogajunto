@@ -136,6 +136,7 @@
                 <th>Link/@</th>
                 <th>Email</th>
                 <th>Horário</th>
+                <th>Link entrega</th>
                 <th>Contatado</th>
               </tr>
             </thead>
@@ -343,6 +344,12 @@
 
     let GANHADORES_CACHE = [];
 
+    function copiarLink(link){
+      navigator.clipboard.writeText(link).then(()=>{
+        showMsg('gan-msg','Link copiado! Cole no email para o ganhador.','ok');
+      });
+    }
+
     async function carregarGanhadores(){
       const r = await rpc('admin_list_ganhadores', { p_senha: SENHA });
       if(r.status === 'unauthorized'){ sair(); return; }
@@ -358,21 +365,28 @@
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#555;padding:1rem;">Nenhum ganhador ainda</td></tr>';
         return;
       }
-      tbody.innerHTML = GANHADORES_CACHE.map(g => `
-        <tr>
+      tbody.innerHTML = GANHADORES_CACHE.map(g => {
+        const link = g.token_entrega
+          ? 'https://canaljogajunto.com.br/entrega.html?token=' + g.token_entrega
+          : '(já usado ou pendente)';
+        const linkHtml = g.token_entrega
+          ? `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="copiarLink('${link}')">📋 Copiar link</button>`
+          : `<span style="color:#555;font-size:11px;">✅ Entregue</span>`;
+        return `<tr>
           <td><strong style="color:#FFD700;">${g.posicao}º</strong></td>
           <td><strong>${escape(g.canal_nome)}</strong></td>
           <td style="color:#888;font-size:12px;">${escape(g.canal_link)}</td>
           <td>${escape(g.email)}</td>
           <td style="font-size:11px;color:#888;">${new Date(g.criado_em).toLocaleString('pt-BR')}</td>
+          <td>${linkHtml}</td>
           <td>
             <button class="btn ${g.vencedor ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px;font-size:12px;"
               onclick="toggleVencedor('${g.id}', ${!g.vencedor})">
               ${g.vencedor ? '✅ Sim' : '⬜ Não'}
             </button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
     async function toggleVencedor(id, val){
