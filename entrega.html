@@ -78,6 +78,20 @@
       <div class="field"><label>Complemento (opcional)</label><input type="text" id="f-complemento" placeholder="Apto, bloco, referência..."/></div>
       <div class="field"><label>📝 Observação (opcional)</label><textarea id="f-obs" placeholder="Algo importante pro envio?"></textarea></div>
 
+      <div style="margin-bottom:0.85rem;">
+        <label class="check-item" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;background:#0d0d1a;border:2px solid #2a2a45;border-radius:12px;">
+          <input type="checkbox" id="ck-menor" onchange="toggleResponsavel()" style="width:16px;height:16px;accent-color:#FFD700;cursor:pointer;flex-shrink:0;"/>
+          <span style="font-size:13px;font-weight:700;color:#cbc7bd;">👶 O ganhador tem menos de 18 anos</span>
+        </label>
+      </div>
+
+      <div id="bloco-responsavel" style="display:none;background:#0d0d1a;border:2px solid #FFD700;border-radius:16px;padding:1rem;margin-bottom:0.85rem;">
+        <div style="font-size:12px;font-weight:800;color:#FFD700;letter-spacing:1px;text-transform:uppercase;margin-bottom:0.75rem;">👨‍👩‍👧 Responsável legal</div>
+        <div class="field"><label>Nome completo do responsável</label><input type="text" id="f-resp-nome" placeholder="Nome do pai/mãe ou responsável"/></div>
+        <div class="field"><label>CPF do responsável</label><input type="text" id="f-resp-cpf" placeholder="000.000.000-00" maxlength="14"/></div>
+        <div style="font-size:11px;color:#666;font-weight:600;margin-top:4px;">O prêmio será enviado em nome e endereço do responsável acima.</div>
+      </div>
+
       <button class="btn" id="btn" onclick="submit()">🚀 ENVIAR CADASTRO</button>
       <div class="msg" id="msg"></div>
     </div>
@@ -102,6 +116,11 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjd2Z0eWlrYnJpb3lyZ3JraWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Mjg0MDcsImV4cCI6MjA5NTMwNDQwN30._-y6vqfl2i06u80jn9Wbp_m5QfV3kzueuNLa4Muecdk';
 
     function val(id){ return document.getElementById(id).value.trim(); }
+
+    function toggleResponsavel(){
+      const checked = document.getElementById('ck-menor').checked;
+      document.getElementById('bloco-responsavel').style.display = checked ? 'block' : 'none';
+    }
     function showMsg(t, type){
       const m = document.getElementById('msg');
       m.textContent = t;
@@ -145,6 +164,15 @@
       const required = ['p_email','p_nome_completo','p_cpf','p_cep','p_logradouro','p_numero','p_bairro','p_cidade','p_uf'];
       for(const k of required){
         if(!payload[k]){ showMsg('Preencha todos os campos obrigatorios', 'err'); return; }
+      }
+
+      const menor = document.getElementById('ck-menor').checked;
+      if(menor){
+        const respNome = val('f-resp-nome');
+        const respCpf  = val('f-resp-cpf');
+        if(!respNome || !respCpf){ showMsg('Preencha nome e CPF do responsável', 'err'); return; }
+        payload.p_observacao = '[MENOR DE IDADE] Responsável: ' + respNome + ' | CPF: ' + respCpf
+          + (payload.p_observacao ? ' | Obs: ' + payload.p_observacao : '');
       }
 
       btn.disabled = true; btn.textContent = '⏳ Enviando...';

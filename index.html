@@ -180,7 +180,6 @@
               <label class="check-item"><input type="checkbox" id="ck3"/><span>📞 Autorizo contato se estiver entre os vencedores.</span></label>
               <label class="check-item"><input type="checkbox" id="ck4"/><span>ℹ️ Ciente de que o YouTube não patrocina este desafio.</span></label>
               <label class="check-item"><input type="checkbox" id="ck5"/><span>🔒 Li e concordo com a <a href="privacidade.html" target="_blank">Política de Privacidade</a> (LGPD).</span></label>
-              <label class="check-item"><input type="checkbox" id="ck6"/><span>🔞 Declaro que tenho 18 anos ou mais de idade.</span></label>
             </div>
             <button class="btn-send locked" id="btn-send" disabled onclick="handleSubmit()">🔒 Aguarde a abertura...</button>
           </div>
@@ -346,7 +345,7 @@
       const email=document.getElementById('f-email').value.trim().toLowerCase();
       const answer=document.getElementById('f-answer').value.trim();
       const secret=document.getElementById('f-secret').value.trim().toUpperCase();
-      const checks=['ck1','ck2','ck3','ck4','ck5','ck6'].every(id=>document.getElementById(id).checked);
+      const checks=['ck1','ck2','ck3','ck4','ck5'].every(id=>document.getElementById(id).checked);
       const btn=document.getElementById('btn-send');
 
       // trava: só envia se já abriu
